@@ -21,7 +21,7 @@ window.TW_CAMPAIGN = {
   /* ── Identity ─────────────────────────────────────────────────
      `id` rides on the form payload as landing_id and on every analytics
      event. Use the repo name. */
-  id: 'tw-demo',
+  id: 'tw-flip-cards-lp-2',
 
   /* ── The offer ────────────────────────────────────────────────
      NUMBERS ONLY. The words around them live in `strings` below, once per
