@@ -73,19 +73,19 @@
 /* Wide: the logo is in the bar. Narrow: it moves to .tw-logorow below. */
 .tw-hdr__logo { display: none; }
 .tw-hdr__logo img,
-.tw-logorow__logo img { display: block; height: 32px; width: auto; }
+.tw-logorow__logo img { display: block; height: 28px; width: auto; }
 
 /* The logo row: narrow screens only. Logo centred under the controls, above
    the page (Figma 42:3651). Its height is a variable because css/fold.css
    subtracts it from the mechanic. */
-:root { --tw-logorow-h: 60px; }
+:root { --tw-logorow-h: 57px; }
 .tw-logorow {
   flex: 0 0 auto;
   display: flex;
   justify-content: center;
-  align-items: center;
+  align-items: flex-start;
   height: var(--tw-logorow-h);
-  padding-top: 8px;
+  padding-top: 29px;       /* Figma 42:3654: logo top is 29px under the 56px bar */
 }
 
 /* Narrow: controls only. Language on the left, auth on the right -- the
@@ -93,31 +93,37 @@
 .tw-hdr__right { display: flex; flex: 1 1 auto; align-items: center; gap: 8px; min-width: 0; }
 .tw-hdr__right > .tw-btn--ghost { margin-left: auto; }
 
-/* 44px controls with a 16px label: the design draws 32px pills with 13px
-   text, which misses the tap target iOS asks for by 12px. */
+/* Narrow: the design's 32px pills with 13px text (Figma 42:3685). The visible
+   pill is 32px; ::after grows the tappable area to 44px so the tap target
+   iOS asks for is still met. The wide arrangement below takes the 44px pills. */
 .tw-mute,
 .tw-lang {
   display: flex;
   align-items: center;
-  gap: 8px;
-  height: 44px;
-  padding: 0 14px;
-  border-radius: var(--r-md);
+  gap: 6px;
+  position: relative;
+  height: 32px;
+  padding: 0 10px;
+  border-radius: 10px;
   border: 1px solid var(--chrome-ctl-brd);
   background: var(--chrome-hair);
   color: var(--text);
   font-family: var(--font);
   font-weight: var(--fw-semi);
-  font-size: 15px;
+  font-size: 13px;
   transition: scale 140ms var(--ease-out);
 }
 
-.tw-mute { width: 44px; padding: 0; justify-content: center; }
+.tw-mute { width: 32px; padding: 0; justify-content: center; }
+
+.tw-mute::after,
+.tw-lang::after,
+.tw-btn::after { content: ""; position: absolute; inset: -6px -3px; }
 
 .tw-mute svg,
 .tw-lang svg {
-  width: 18px;
-  height: 18px;
+  width: 14px;
+  height: 14px;
   fill: none;
   stroke: currentColor;
   stroke-width: 1.8;
@@ -131,26 +137,27 @@
 .tw-mute[aria-pressed="true"] .tw-mute__off { display: block; }
 
 .tw-lang { color: var(--white); }
-.tw-lang__caret { width: 14px; height: 14px; transition: transform 180ms var(--ease-out); }
+.tw-lang__caret { width: 10px; height: 6px; transition: transform 180ms var(--ease-out); }
 .tw-lang[aria-expanded="true"] .tw-lang__caret { transform: rotate(180deg); }
 
 /* Press feedback. They are buttons and were behaving like labels. The logo is
    qualified on [href] because it only becomes a link when links.home is set
    in campaign.js -- a mark that shrinks under the thumb and then does nothing
    reads as a broken control rather than as a logo. */
-/* Log in / Sign up. Real <a> and <button>, 44px tall, same radius as the
-   language pill. Sign up keeps Orange Fire and takes dark ink: white on it is
-   3.44:1. */
+/* Log in / Sign up. Real <a> and <button>, same height and radius as the
+   language pill. Sign up keeps Orange Fire and takes white ink (--accent-ink,
+   owner decision 2026-11-03). */
 .tw-btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  position: relative;
   flex: 0 0 auto;
-  height: 44px;
-  padding: 0 14px;
-  border-radius: var(--r-md);
+  height: 32px;
+  padding: 0 12px;
+  border-radius: 10px;
   font-family: var(--font);
-  font-size: 14px;
+  font-size: 13px;
   white-space: nowrap;
   text-decoration: none;
   cursor: pointer;
@@ -314,6 +321,7 @@
 
 .tw-ftr__label {
   font-size: 12px;
+  line-height: 15px;           /* Figma 42:3712 text boxes are 15px tall */
   font-weight: var(--fw-semi);
   text-transform: uppercase;
 }
@@ -332,7 +340,7 @@
   align-items: center;
   justify-content: center;
   height: 36px;
-  padding: 6px 10px;
+  padding: 6px 9px;            /* + the 1px border = Figma's 10px: visa badge 94px wide */
   border: 1px solid var(--footer-brd);
   border-radius: var(--r-sm);
   background: var(--pay-bg);
@@ -342,16 +350,17 @@
    the three aspect ratios. `auto` would let a stretched viewBox decide. */
 .tw-ftr__mark { height: 24px; width: 24px; }
 .tw-ftr__mark--visa { width: 74px; }
-.tw-ftr__mark--mc   { width: 39px; }
+.tw-ftr__mark--mc   { width: 38.77px; }
 
 /* The rule between the payments and the copyright is the copyright's own top
    border, with 32px of air on each side of it. */
 .tw-ftr__copy {
   width: 100%;
   margin-top: 32px;
-  padding-top: 32px;
+  padding-top: 31px;           /* + the 1px rule = Figma's 32px under a 0-height divider */
   border-top: 1px solid var(--footer-brd);
   font-size: 12px;
+  line-height: 15px;
   font-weight: var(--fw-regular);
 }
 
@@ -360,20 +369,32 @@
    19:3624 for the footer, and the taller header bar, at one breakpoint. */
 
 @media (min-width: 700px) {
-  :root { --tw-hdr-h: 72px; --tw-logorow-h: 0px; }
+  /* Figma 42:3592: bar 108px, logo 64px tall, 120px side padding at 1920. Bar
+     and logo scale with the viewport width down to a 72px / 40px floor. */
+  :root { --tw-hdr-h: clamp(72px, 5.625vw, 108px); --tw-logorow-h: 0px; }
   .tw-hdr { padding: 0 clamp(16px, 6.25vw, 120px); }
   .tw-logorow { display: none; }
 
   .tw-hdr__logo { display: block; }
   .tw-hdr__right { flex: 0 0 auto; gap: 12px; }
   .tw-hdr__right > .tw-btn--ghost { margin-left: 0; }
-  .tw-hdr__logo img { height: 36px; }
+  .tw-hdr__logo img { height: clamp(40px, 3.334vw, 64px); }
 
-  .tw-btn { padding: 0 22px; font-size: 15px; }
+  /* Controls: 44px pills, 12px radius, 15px label (Figma 42:3638). */
+  .tw-mute,
+  .tw-lang,
+  .tw-btn { height: 44px; border-radius: var(--r-md); font-size: 15px; }
+  .tw-mute { width: 44px; }
+  .tw-lang { gap: 8px; padding: 0 14px; }
+  .tw-lang svg { width: 16px; height: 16px; }
+  .tw-btn { padding: 0 22px; }
+  .tw-mute::after,
+  .tw-lang::after,
+  .tw-btn::after { content: none; }
 
   .tw-ftr {
     flex-direction: row;
-    align-items: center;
+    align-items: flex-start;     /* Figma 42:3650: logo, copyright and payments share one top edge */
     justify-content: space-between;
     gap: 40px;
     padding: 48px clamp(24px, 6.25vw, 120px) 40px;
@@ -381,8 +402,8 @@
   }
 
   /* The logo is the new one, white box and all, so it needs no plate. */
-  .tw-ftr__logo { display: block; flex: none; order: 1; }
-  .tw-ftr__logo img { display: block; width: auto; height: 28px; }
+  .tw-ftr__logo { display: flex; align-items: center; height: 24px; flex: none; order: 1; }
+  .tw-ftr__logo img { display: block; width: auto; height: 22px; }   /* 110px wide: Figma 42:3650 plate */
 
   /* The DOM carries the narrow order -- payments, then copyright -- and this
      layout restates its own, so reading order and visual order match. */
@@ -396,9 +417,18 @@
     padding-top: 0;
     border-top: 0;
     font-size: 14px;
+    line-height: 17px;
+    padding-top: 3.5px;          /* centred in the logo's 24px row */
     text-align: right;
   }
 
   .tw-ftr__pay   { align-items: flex-start; gap: 16px; }
-  .tw-ftr__label { font-size: 14px; text-align: left; }
+  .tw-ftr__label { font-size: 14px; line-height: 17px; text-align: left; }
+}
+
+/* Figma 42:3209: the payments column sits in a fixed 476px slot, flush left,
+   with the copyright running up to it. Below 1400px the slot is as wide as the
+   marks. */
+@media (min-width: 1400px) {
+  .tw-ftr__pay { width: 476px; }
 }

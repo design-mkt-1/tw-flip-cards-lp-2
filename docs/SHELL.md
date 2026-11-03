@@ -18,11 +18,14 @@ layout, at and above it the wide one.
 
 *1280px, wide layout. Logo at left, the language button at right.*
 
-- **Bar:** 56px tall below 700px, 72px at 700px and above, with a gold hairline under it.
-- **Logo:** 36px tall in the bar on wide. Below 700px it leaves the bar and sits
-  centred on its own 60px row under it (32px tall). The logo is the brand's own file.
-- **Language button:** 44px tall, a globe, the current code (UA / RU / EN), a caret.
-- **Вхід / Реєстрація:** 44px tall. "Вхід" is an outline link to `links.login`
+- **Bar:** 56px tall below 700px; from 700px it is 108px at 1920 (5.625vw, never
+  under 72px), with a gold hairline under it.
+- **Logo:** 64px tall in the bar at 1920 (3.334vw, never under 40px). Below 700px it
+  leaves the bar and sits centred on its own 57px row under it, 29px below the bar
+  and 28px tall. The logo is the brand's own file.
+- **Language button:** 44px tall on wide, 32px on narrow (tap area stays 44px), a
+  globe, the current code (UA / RU / EN), a caret.
+- **Вхід / Реєстрація:** 44px tall on wide, 32px on narrow. "Вхід" is an outline link to `links.login`
   (no `href` while it is empty). "Реєстрація" is the orange button; it calls
   `TW.openForm()`.
 
@@ -69,7 +72,7 @@ landing, so it goes into the template, not into one campaign.
 
 *375px, mobile layout. The payment marks, a rule, then the copyright. There is no logo.*
 
-- **Wide:** one row. Logo (28px, no plate), the copyright right-aligned, then the
+- **Wide:** one row. Logo (22px tall, 110px wide), the copyright right-aligned, then the
   payments column: label above the marks. Padding 48px top and 40px bottom.
 - **Mobile:** a column, centred. The payment marks, a rule, then the copyright.
   The logo is left out. Both have a gold hairline on the top edge.

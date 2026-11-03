@@ -6,6 +6,18 @@ here and a bump to `TEMPLATE-REV` in
 just code, also edits `references/decisions.md` in the same commit — same
 repo, same commit, same review, so the two cannot drift apart.
 
+## v1.0.11
+
+Header/footer dimensions matched to Figma (42:3592 / 42:3650 wide, 42:3652 /
+42:3712 narrow). Shared file changes: `css/shell.css`; SHARED.lock is
+regenerated. Wide: bar 108px and logo 64px tall at 1920 (scales with the
+viewport down to 72px / 40px), 44px controls with 16px globe and 10x6 caret,
+footer logo plate 110px and a fixed 476px payments slot from 1400px. Narrow:
+32px controls (13px text, 10px radius; the tap area stays 44px through an
+invisible ::after) and the logo row at 29px under the bar, logo 28px tall.
+Wide footer: logo, copyright and payments share one top edge; payment badges
+are 94px / 58.8px / 44px wide as drawn. Docs: `docs/SHELL.md`; `TEMPLATE-REV` bumped.
+
 ## v1.0.10
 
 White text on orange buttons (owner decision 2026-11-03, Figma). Shared file
