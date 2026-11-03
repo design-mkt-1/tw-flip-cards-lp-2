@@ -1,0 +1,183 @@
+# Changelog
+
+Every change to a file in the `SHARED` list in `tools/drift.py` gets a line
+here and a bump to `TEMPLATE-REV` in
+`.claude/skills/topwin-lp/SKILL.md`. A change that alters a *decision*, not
+just code, also edits `references/decisions.md` in the same commit — same
+repo, same commit, same review, so the two cannot drift apart.
+
+## v1.0.8
+
+Text only: no behaviour changes. README-IT and the comments told IT four wrong
+things, found by tw-penalty's IT archive audit on 2026-10-09.
+
+- `tools/handoff.py` — README-IT:
+  - CSP: `form-action` is absent, so the `/api/welcome` POST is not
+    restricted. If IT adds it, it must allow the origin of the `redirectUrl`
+    in the registration response (TopWin: the tracker mirror), and the
+    landing's `rules` origin only when there is no `redirectUrl`. It used to
+    say "the casino domain", which would block the hand-off silently.
+  - `config.json` sits next to `index.html`, also on subfolder hosting; it
+    used to say "the site root".
+  - Terms, Privacy and Login come from the landing response; IT does nothing
+    for them, and the `campaign.js` values are only a fallback. The "BLOCKS
+    GO-LIVE" labels are gone.
+  - The promo code is IT's, set on their CRM landing (`promocode`).
+  - Section 7 no longer counts the guards.
+- `js/platform.js`, `tools/platform_test.py` — comments: `config.json` is next to
+  `index.html`, not at the site root.
+- `tools/drift.py` — comment: "the guards", not "the four guards".
+- `campaign.js` — `offer.code` is `''`, not `'DEMO225'`, with a comment that
+  says where it goes: `js/form.js § payload()` still sends it as `bonus` when
+  the form is NOT on the platform (`form.endpoint`, or the demo console), so
+  the key stays; `js/platform.js` never reads it. The links comment says
+  terms/privacy/login come from the platform and block go-live only off it.
+- `index.html` — the CSP comment names the `redirectUrl` origin, not the casino
+  domain.
+- `README.md`, `CAMPAIGN.md`, `references/seams.md`, `references/checklist.md`,
+  `references/decisions.md`, `SKILL.md` — the same corrections; five guards,
+  with `platform_test.py` in the list.
+
+## v1.0.7
+
+- `js/platform.js` — new, shared. Every landing registers through IT's platform
+  by default: the config, the landing GET, reCAPTCHA v3, the registration POST
+  and the SSO hand-off. Copied byte-for-byte from tw-flip-cards-lp `0186bc6`,
+  IT's reference landing, which is live. Email only; the phone tab is removed.
+  `references/decisions.md § 15`.
+- `index.html` — `js/platform.js` loaded after `js/shell.js`. The CSP names the
+  platform's origins (the production and dev APIs, ipify, reCAPTCHA, GA, GTM,
+  Yandex) and the commented analytics swap is gone: analytics come from the
+  landing response now. `references/seams.md § The platform contract`.
+- `css/form.css` — `.grecaptcha-badge` hidden, as IT's LP hides it.
+- `campaign.js` — `form.onRegister` is `TWPlatform.register`, `form.hiddenFields`
+  is empty (`landing_id` comes from `config.json`), the `platform` block, and
+  the platform strings (`err.exists`, `err.recaptcha`, `pl.off.*`) in UA/RU/EN.
+- `config.example.json` — new, shared shape with a placeholder id `0`, not
+  IT's 12. `config.json` is in `.gitignore`.
+- `tools/platform_stub.py`, `tools/platform_test.py` — new, shared. 67 checks
+  against a stub; no request leaves the page. Run in `.github/workflows/pages.yml`.
+- `tools/handoff.py` — README-IT gets section 3, the platform connection, written
+  for any landing.
+- `.github/workflows/pages.yml` — `platform_test.py` in the guards. The publish
+  allowlist is unchanged: `config.example.json`, `tools/` and `docs/` do not ship.
+- `CAMPAIGN.md` — step 4, "Connect to IT". The steps after it are renumbered.
+- `docs/SHELL.md` — new: a visual guide to the header and footer.
+
+## v1.0.6
+
+- `js/i18n.js` — `campaign.js § languageUrls`. Empty keeps today's behaviour:
+  one HTML file, the table swaps in place, `?lang=` and the saved choice both
+  win. Filled with a URL per language code, the menu navigates instead, and
+  `<html lang>` on the file decides the language — `?lang=` and a stale
+  `localStorage` entry are both ignored, because on a three-file landing they
+  would leave the card speaking a different language than the page around it.
+  Written for tw-flip-cards-lp, which serves ua/ru/en as separate indexable
+  URLs and until now had to pin `languages` to one entry per file to stay
+  safe. `references/decisions.md § 8a`.
+- `campaign.js` — the `languageUrls` key, empty, with both modes written out.
+
+## v1.0.5
+
+- `css/reset.css` — `body { font-family: var(--font) }`. The page had no font
+  at all: every control in `css/shell.css` and every field in `css/form.css`
+  names the family itself, so the header and the card looked right and hid it,
+  while the footer's two lines and the `<noscript>` paragraph inherited the
+  browser's default serif. The shared footer shipped in Times New Roman, in
+  the template and in every clone of it. Neither guard could see it —
+  `tools/fonts.py` checks that a glyph exists in a shipped face, not which
+  face draws it, and `tools/smoke.py` measures geometry. Found by putting the
+  three landings' footers side by side.
+
+## v1.0.4
+
+- `js/shell.js` — the offer's hero figure is a campaign decision, not a
+  hard-coded percent. `dialogHTML()` reads `offer.hero` (`'percent'` or
+  `'amount'`, defaulting to the percent when there is one), gives that node
+  `.tw-promo__pct` and the rest `.tw-promo__sub`. New `fitHero()` counts the
+  rendered string after i18n and on every language change, and above five
+  non-space characters adds `.tw-promo__pct--long`.
+- `css/form.css` — `.tw-promo__pct--long`, 50/42/60px against the hero's
+  84/68/100. Found by putting the casino landing's offer on this card: it has
+  no percent, so it arrived with no large figure at all, and the only fix
+  available to a campaign was editing this file. The reasoning is in
+  `references/decisions.md § 7a`.
+- `campaign.js` — the `hero` key, and the note that an amount which leads wants
+  `promo.amount` overridden to the figure alone.
+
+## v1.0.3
+
+- `.github/workflows/pages.yml` — the build deletes `campaign/smoke.py` and any
+  `__pycache__` from `_site` after the copy. `campaign/` is on the allowlist
+  because the mechanic lives there, and the campaign's own Playwright check
+  sits beside it: served on the live URL, that is the same mistake as
+  publishing `tools/`, arriving through a door that is meant to be open. Found
+  when a `.pyc` turned up in the preview build.
+- `tools/handoff.py` — the same two exclusions, and its closing assert now
+  fails on them too, so the archive IT receives cannot carry them either.
+
+## v1.0.2
+
+- `css/shell.css` — the bar is 52px, and 64px above 700px, down from 56 and 74;
+  the logo 22px and 28px, down from 24 and 34. The 44px controls are untouched:
+  the tap target was not what was too big. The height is now `--tw-hdr-h`,
+  declared beside the bar, because `css/fold.css` subtracts it.
+- `css/fold.css` — NEW, and shared. The third page shape: `#tw-main` is a
+  definite box of `92svh` minus the header, the page scrolls, and the footer
+  starts below the fold with only its top edge showing. A campaign links this
+  or `css/stage.css`, never both.
+- `js/audio.js` — NEW, and shared. The sound pool `tw-penalty` carried in its
+  own campaign folder: nothing loads until the visitor's first gesture, the
+  mute state persists through a `try`, a clip that fails to load never plays.
+  `js/shell.js` wires the speaker it already drew and exposes `TW.sound(name,
+  volume)` and `TW.muted()`; `campaign.js § sounds` is the map, empty by
+  default, and an empty map means no speaker at all.
+- `tools/drift.py` — the `SHARED` list gains both new files: 16 entries.
+
+## v1.0.1
+
+- `css/reset.css` — `ul, ol { list-style: none }`. The reset removed the
+  indent and left the marker, and `css/shell.css` had quietly set this on its
+  own two lists, so the gap only ever showed up in a campaign: the flip-cards
+  retrofit drew nine cards on a grid with a white dot beside each of them.
+  Found while porting that landing onto the template.
+- `tools/handoff.py` — new, and not a shared file. Zips exactly what
+  `.github/workflows/pages.yml` stages, by reading that workflow's own
+  `cp -r ... _site/` line rather than restating the list, and writes a
+  README-IT.md beside it: the five link seams, the form endpoint, the
+  passthrough parameters an affiliate click id rides on, and the browser floor.
+
+## v1.0.0
+
+First version. Built from `tw-penalty` and `tw-flip-cards-lp`, taking the
+better half of each where they disagreed.
+
+- `css/tokens.css` — the penalty token system verbatim: 11-step ramps derived
+  from Orange Fire `#ff4500` and Midnight Navy `#191970`, a semantic layer, and
+  the two brandbook contradictions resolved in writing. Added the two one-glyph
+  Noto cuts for the hryvnia sign, and named the header-chrome, dialog-shadow
+  and scrim values that were previously hex literals in other stylesheets.
+- `css/shell.css` — the penalty header, lifted out of its game stylesheet, and
+  the penalty footer. Every `cqh`/`cqw` converted to px and one 700px
+  breakpoint, so neither bar depends on a layout any more.
+- `css/form.css` — the penalty card's content on the flip-cards `<dialog>`
+  mechanics. Top layer, so the pop-up is layout-neutral.
+- `css/stage.css` — the penalty no-scroll stage, generalised to `body` and
+  `#tw-main` and made opt-in with one `<link>`.
+- `js/i18n.js` — the penalty runtime engine plus `{}` interpolation, a
+  `?lang=` override, and a merge with the campaign's own string table.
+- `js/shell.js` — new. Builds the header, footer and dialog from the config,
+  wires the five URL seams with UTM and affiliate passthrough, and exposes
+  `window.TW`.
+- `js/form.js` — the penalty validation and confirmation screen, rehosted on
+  the native dialog. The hand-written focus trap and `inert` bookkeeping are
+  gone; `showModal()` does it.
+- `campaign.js` — new. The single config surface.
+- `tools/tokens.py` — new. The guard that would have caught every colour
+  divergence in this project's history.
+- `tools/drift.py` — new. Replaces the three-file parity job, which had
+  nothing left to compare.
+- `tools/fonts.py` — coverage check only, reading real cmaps rather than
+  declared unicode-ranges.
+- `tools/smoke.py` — the flip-cards Playwright harness, generalised, with five
+  assertions only a template needs.

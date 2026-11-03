@@ -1,0 +1,574 @@
+# Decisions
+
+Thirteen areas, all settled. REJECTED names the option that lost, because the
+losing option is the one a future agent reinvents from first principles and
+ships as an improvement.
+
+Read this before changing an architectural choice, not to justify one — the
+CODE line is where the current answer lives.
+
+---
+
+## 1. Brand tokens
+
+**DECISION** Two hero colours — Orange Fire `#ff4500`, Midnight Navy `#191970`
+— expanded into 11-step ramps by one published mix schedule: the 500 is the
+brandbook value verbatim, 50–400 are it mixed with white at 92/84/68/42/20%,
+600–950 with black at 16/34/52/70/84%, all sRGB.
+
+**WHY** A new tint is then a mix, not a guess.
+
+**CODE** `css/tokens.css § "Palette"`.
+
+**REJECTED** Inventing a shade where it is needed. Two landings ago three
+greens — `#30d158`, `#3dd629`, `#3fd62b` — sat in three stylesheets all meaning
+the same green; the two landings after that each wrote their own AA-safe orange
+(`#d63a00`, `#d93900`), green (`#006e3d`, `#00874a`) and muted grey (`#5f6673`,
+`#656d7e`): six values for three roles.
+
+The brandbook is not self-consistent and the ramps do not paper over it. "BG
+SECONDARY" lists hex `#FF4500` beside RGB(243,244,245) — the RGB is right, the
+hex is a paste of Orange Fire. "BG THIRD" is defined twice, `#DCDEEA` and
+`#FFDACC`. Both survive under names that say which is which, so nobody has to
+pick one and be silently wrong.
+
+The ten brandbook hexes, so drift is detectable without opening a file:
+`#ff4500` Orange Fire · `#191970` Midnight Navy · `#ffffff` BG main ·
+`#f3f4f5` BG secondary · `#dcdeea` BG third (page 1) · `#ffdacc` BG third
+(page 2) · `#1f1f1f` BG dark · `#e7e6e9` stroke · `#2a2a2a` text main ·
+`#737b8c` text secondary, superseded by area 2.
+
+---
+
+## 2. The AA-safe pairing rule
+
+**DECISION** The 500s stay hero colours for large type and filled shapes; as
+small text they take a darker step from the same ramp schedule, named in the
+token file rather than applied at the call site.
+
+**WHY** Four pairings in the delivered design fall under WCAG AA 4.5:1 for
+small text, and they are brand colours — so the fix is a token, not a redraw.
+
+| drawn as | on | ratio | replacement |
+|---|---|---|---|
+| `#00a75c` consent links, 13px | white | 3.12 | `--green-on-light` → `--green-700` `#006e3d` |
+| `#ff4500` "Log in", 14px | white | 3.44 | `--accent-on-light` → `--orange-600` `#d63a00` |
+| `#737b8c` placeholders, credential labels | `#f3f4f5` | 3.86 | `--text-muted` → `--txt-secondary` `#5f6673` |
+| `#737b8c` consent text, inactive tab | white | 4.25 | `--text-muted` → `--txt-secondary` `#5f6673` |
+
+The fifth is the control the page exists to get pressed: the design sets white
+on Orange Fire, 3.44:1. `--accent-ink` puts dark ink on it, which clears AA and
+— unlike darkening the button — leaves the hero colour exactly as specified.
+`--chrome-hint` `#9a9aa0` is the same move against the design's `#8e8e93`.
+
+**CODE** `css/tokens.css § "Signals on a light background"`; the comments at
+`css/form.css` lines 562 and 611.
+
+**REJECTED** Leaving the brand colours and noting the failure — which is what
+`tw-flip-cards-lp/README.md § 9.6` did: all four listed with their ratios and a
+proposed fix that was never applied.
+
+---
+
+## 3. Typography
+
+**DECISION** One family: Roboto, self-hosted, variable, with both axes (`wght`
+100–900, `wdth` 75–100) and a real italic cut. Eight woff2 — six Roboto, one per
+unicode subset per style, plus two one-glyph Noto Black cuts for the hryvnia.
+
+**WHY** The promo headline is Roboto Condensed Black Italic, which with the
+width axis present is this same family at `font-stretch: 75%` — a coordinate,
+not a second download.
+
+**CODE** `css/tokens.css § "Self-hosted type"` and `§ "Type"`; the two preloads
+in `index.html`; `assets/fonts/OFL.txt`.
+
+**REJECTED** Russo One, which the brandbook prescribes for headlines but no
+delivered screen uses — it appears only on the brandbook's own pages, and the
+screens are the specification. Also Inter, which the designer used for the card
+and footer UI while the brandbook says Roboto. Neither is a substitution forced
+by a missing file; both resolve in Figma, so Inter was a deliberate choice being
+deliberately not carried.
+
+Two subsets are preloaded, not one, and not because the default is Ukrainian:
+the first paint draws both scripts. The copy is Cyrillic; the offer figures, the
+tab labels and the UA apostrophe are latin, and the Cyrillic range stops short
+of the apostrophe.
+
+---
+
+## 4. Layout — the four modes
+
+**DECISION** The shell has no opinion about the page box: `css/shell.css` is
+px, rem and `clamp()` of a viewport width, with no `vh`, `cqh`, `cqw` or `--u`
+anywhere. The campaign picks mode A (scrolling page, the default and nothing to
+do), B (the `css/stage.css` `<link>`, a fixed stage that never scrolls) or C
+(an artboard `--u` unit, for the mechanic only). Mode **B2**, added in v1.0.2,
+is the `css/fold.css` `<link>`: `#tw-main` is a definite box `92svh` minus the
+header, the page scrolls, and the footer starts below the fold with only its
+top edge showing.
+
+**WHY** Those units are exactly what welded the two previous landings to their
+own layouts — one page's header lived inside a container query on `#stage` and
+could not be lifted out, the other's chrome was in artboard units and could not
+be reused at any other size.
+
+**CODE** `css/shell.css § header comment`; `css/stage.css § file header`;
+`campaign/main.css § "Choosing a layout"`.
+
+**REJECTED** A height in viewport units for the stage: on iOS `100vh` is the
+tallest the viewport ever gets, so the page scrolls by exactly the height of the
+browser chrome, and `svh`/`dvh` fix the number then reflow the whole layout every
+time the URL bar slides. `position: fixed; inset: 0` is neither wrong nor
+animated.
+
+Also rejected: canvas sizing in the shell. A drawing buffer cannot be set from
+CSS and the canvas belongs to the mechanic, so it lives in `campaign/main.js`.
+There is no `js/stage.js`; do not go looking for one.
+
+`css/stage.css` and `css/fold.css` are the only stylesheets allowed to position
+the page, and a campaign links AT MOST ONE of them. Two files with an opinion
+about the page box is how a shell stops being reusable — which is also why the
+fold is its own file rather than a class inside `css/stage.css`: one file, one
+page shape, and a campaign that has picked neither still gets an ordinary
+scrolling page.
+
+`css/fold.css` is allowed `svh` where the shell is not, for the same reason
+`css/stage.css` is allowed `position: fixed`: being the page box is its whole
+job. `svh` and not `dvh` — the small viewport is stable, and it is the one that
+cannot hide the footer's edge behind an expanded URL bar. The 92% is the
+decision, not the technique: all of it and the footer is unreachable without a
+scrollbar to hint at it, less of it and the footer stops being below the fold.
+The bar's height comes from `--tw-hdr-h`, declared beside the bar in
+`css/shell.css`, so the subtraction cannot drift from the real height.
+
+---
+
+## 5. Header
+
+**DECISION** Injected by `js/shell.js` into `<div data-tw="header">`, styled in
+`css/shell.css`, and generated from `TW_LOCALES` filtered by
+`campaign.languages`. Controls are 44px with a 16px label. One breakpoint,
+700px, shared with the footer.
+
+**WHY** Markup in a shared JS file is what makes the chrome shared at all — the
+alternative, the same chrome pasted into every campaign's HTML, produced two
+footers, two modals and no header at all across the last two pages.
+
+**CODE** `js/shell.js § headerHTML()`; `css/shell.css § "header"` and
+`§ "language listbox"`; `campaign.js § "Brand and chrome"`.
+
+**REJECTED** `fetch('partials/header.html')` — dead on `file://`, which someone
+will use. Server includes and Jekyll — both source repos ship `.nojekyll`
+deliberately. Custom elements — the same `innerHTML` under a heavier lifecycle
+plus a second thing to explain.
+
+Also rejected: hand-writing the language options in HTML, as the previous
+landing did with three `<li>`, which made adding a language a code change.
+
+The design draws 32px pills with 13px text, missing the iOS tap target by 12px.
+The bar itself is 52px, and 64px above 700px (v1.0.2, down from 56 and 74):
+a promo landing's first screen belongs to the mechanic, and the controls stayed
+at 44px because the tap target is not what was too big.
+
+`header.mute: false` omits the speaker rather than disabling it — a campaign
+with no audio should not render a dead control. So does an empty
+`campaign.js § sounds`: from v1.0.2 the speaker needs both, because
+`js/audio.js` pools nothing without clips and a button that toggles nothing is
+worse than no button. That file is shared and the shell wires it — the shell
+drew the speaker and left the wiring to each campaign, which is one forgotten
+campaign away from a dead control, and it was written twice already. A mechanic
+says `TW.sound('kick', 0.9)` and owns no audio code: the gesture unlock, the
+persisted mute state and a clip that failed to load are the shell's problem. The bar is a stacking context at
+`z-index: 46`, which caps the language menu; the dialog is in the top layer and
+outranks both.
+
+What it costs, stated rather than defended: the chrome needs JavaScript and is
+not in view-source. `<title>`, description and the campaign hero stay static in
+the HTML, where a crawler reads them.
+
+---
+
+## 6. Footer
+
+**DECISION** Two arrangements, not two sizes, at the same 700px breakpoint. The
+DOM carries the mobile order — payments, then copyright — and the wide layout
+restates its own with `order`.
+
+**WHY** On a stage-mode page the height the wide arrangement saves is height the
+mechanic keeps, so it applies as soon as there is room; reordering in CSS keeps
+reading order and visual order matched in both, where moving the markup would
+push the mismatch onto mobile.
+
+**CODE** `js/shell.js § footerHTML()` and the `PAY` table;
+`css/shell.css § "footer"`; `assets/img/icons/PAYMENTS-NOTICE.txt`.
+
+**REJECTED** One shared size rule for the payment marks: the four have three
+aspect ratios, and a rule that fits the Visa wordmark stretches the round ones.
+Also rejected: a social row, which the design team removed when they redrew the
+footer.
+
+The logo is orange and navy and its navy half disappears on `--footer-bg`,
+which is why the design stands it on a white plate in the wide node and leaves
+it out of the mobile one.
+
+---
+
+## 7. The registration popup
+
+**DECISION** A native `<dialog>` opened with `showModal()`. The dialog is the
+scroll container, the card is not, and the close button is a sticky sibling of
+the form. Two panels in one dialog — form and confirmation — so the promo header
+stays and only the body swaps. Two geometries, a plain `@media (min-width: 480px)`.
+
+**WHY** `showModal()` puts the card in the top layer, so it renders identically
+over a fixed stage, an artboard hero and an ordinary scrolling page, with no
+z-index negotiation and no ancestor `overflow` or `transform` able to trap it.
+
+**CODE** `js/form.js § "The dialog is native"` and `§ "open / close"`;
+`js/shell.js § dialogHTML()`; `css/form.css § "the dialog"` and
+`§ "the wide card"`.
+
+**REJECTED** A hand-rolled overlay `<div>`. It cost the previous landing about
+eighty lines of focus trap, inert bookkeeping, Escape handling and scroll
+locking that could not be shared, because the overlay was positioned inside a
+stage only that page had.
+
+Also rejected: a container query on the card. That version had to explain twice
+that an element cannot be styled by its own container query and that a container
+is measured by its content box — a 504px card with 24px of padding queries as
+454 and never matches a 480 threshold.
+
+Also rejected: scrolling on the form. The close button then scrolls away with
+the content, and a phone held sideways leaves about 360px of height, less than
+half of what the form needs, with no Escape key and almost no backdrop to tap.
+The close button ships even though the Figma node has none, for the same reason.
+
+The desktop card is not a scaled mobile card — padding 24→36, logo 101×18 →
+247×44, promo type 16/84/34 → 24/100/44, while tabs, fields, checkbox and button
+keep their mobile sizes exactly. Only what the design changes is in the query.
+
+---
+
+## 7a. Which figure in the offer is the hero
+
+**DECISION** `campaign.js § offer.hero` names it — `'percent'` or `'amount'`.
+Unset, the percent leads if there is one and otherwise the amount. The hero
+node is `.tw-promo__pct`, everything else in the offer is `.tw-promo__sub`, and
+spins are never the hero. `js/shell.js § fitHero()` counts the RENDERED string
+after i18n has filled it and adds `.tw-promo__pct--long` above five non-space
+characters: 84/68/100px becomes 50/42/60px.
+
+**WHY** The card is shared and only the offer changes, but the two landings
+this template comes from lead with different things: the sportsbook with
+`225%`, the casino with `250.000 ₴`. Before this, the shell hard-coded the
+percent as the hero, so a casino offer arrived with no large figure at all —
+and the only way to fix it in a campaign was to edit `css/form.css`, which is
+the exact drift `tools/drift.py` exists to refuse. One key in the campaign
+config is the difference between a card that fits the offer and a fork of the
+shared stylesheet.
+
+**WHY MEASURED, NOT DECLARED** The size cannot be chosen when the markup is
+built: the text arrives from the string table afterwards and changes again with
+the language. `225%` is four characters; `250.000 ₴` is nine and does not fit
+the 84px step in the 248px a 320px phone leaves. Counted rather than measured
+in pixels, because a measurement at that moment would run before the italic
+condensed face has loaded and would answer for the fallback.
+
+**CODE** `js/shell.js § dialogHTML() figure()` and `§ fitHero()`;
+`css/form.css § .tw-promo__pct--long`; `campaign.js § offer`.
+
+**REJECTED** `clamp()` on the hero. The file already refuses fluid type here:
+these are sizes a visitor reads, and browser zoom has to be able to move them.
+Two fixed steps keep that.
+
+Also rejected: letting the campaign set the size in `campaign/main.css`. It
+would work exactly once, and then the two campaigns' cards would differ by a
+number nobody could find — which is what this section exists to prevent.
+
+**FOLLOWS FROM THIS** If the amount is the hero, the campaign overrides
+`promo.amount` to `'{amount} {currency}'`. The shipped string is
+`'up to {amount} {currency}'`, which is a qualifier under a headline, not a
+headline.
+
+---
+
+## 8. i18n
+
+**DECISION** One HTML file, all languages. Nodes opt in with `data-i18n="key"`,
+attributes with `data-i18n-attr="attr:key"`. `TW_STRINGS` (`js/strings.js`)
+merges with `TW_CAMPAIGN.strings` (`campaign.js`), campaign winning. Fallback:
+current locale → the first entry in `languages` → the key itself. Detection:
+`?lang=` → `localStorage['tw-lang']` → `navigator.language` → first entry.
+
+**WHY** A separate HTML file per language was tried in the last landing and
+needed two dedicated CI jobs whose entire purpose was to detect that its own
+three copies had drifted; one file cannot drift from itself.
+
+**CODE** `js/i18n.js § "The model"`, `§ detect()`, `§ apply()`;
+`js/strings.js § "Adding a language"` and the `TW_LOCALES` table.
+
+**REJECTED** Markup inside a string. Sentences with links are five nodes —
+`agree.pre` / `agree.terms` / `agree.mid` / `agree.privacy` / `agree.post` — so
+a locale can reorder the words around the anchors; only the first fragment is a
+real `<label>`, because a click on either link would otherwise toggle the
+checkbox on its way to the anchor.
+
+Also rejected: regex `replace` for interpolation. A value containing `$&` or
+`$1` would be mangled by `String.replace`'s own substitution syntax, and an
+offer amount is exactly the kind of string that arrives from a spreadsheet with
+a stray character in it.
+
+`ua` is a region subtag; the language is `uk`. The design and the menu say UA,
+so `ua` stays the internal code and `TW_LOCALES.tag` carries the real BCP-47 tag
+for `documentElement.lang`, the payload and detection. Without that map every
+Ukrainian browser reports `uk-UA`, misses the table and lands on the fallback —
+which only *looks* right because the fallback happens to be Ukrainian.
+
+Adding a language is four edits and no new file. `?lang=` is deliberately not
+persisted: a link that forces a language should not overwrite what the visitor
+chose last visit. `\n` is a real line break; the markup carries no `<br>`.
+
+### 8a. One file, or one file per language
+
+**DECISION** `campaign.js § languageUrls` decides. Empty — the shipped
+default — is one HTML file: the table swaps in place, the choice persists in
+`localStorage`, and `?lang=ru` forces a language for a creative. Filled with a
+URL per code, each language is its own file: the menu navigates,
+`<html lang>` on the file decides which table renders, and neither a saved
+choice nor `?lang` can override it.
+
+**WHY** tw-flip-cards-lp serves `index.html`, `ru.html` and `en.html` with
+`hreflang` between them, because three indexable URLs is what the campaign
+buys with them. Put the shared header on that landing without this and the
+menu would re-render the card in English inside a Russian page, or a stale
+`tw-lang` in localStorage would do it on the first paint. Before this existed
+the landing had to pin `languages` to a single entry per file, which bought
+safety by removing the menu.
+
+**CODE** `js/i18n.js § "one language per file"` — `byFile()`, `urlFor()`, and
+the two branches in `detect()` and `choose()`; `campaign.js § languageUrls`.
+
+**REJECTED** Rendering the menu as `<a href>` in file mode. It reads better in
+isolation, but it forks `js/shell.js` into two markups for one control, and
+the listbox is what the design draws. One branch in `choose()` is the whole
+difference.
+
+**REJECTED** Detecting the language in file mode at all. The file is the
+answer; anything else is a second opinion about a question already settled.
+
+---
+
+## 9. Animation and motion
+
+**DECISION** One curve, `--ease-out`. Entry is slower than exit everywhere —
+the language menu enters at 180ms and leaves at 120ms, the dialog enters at
+280ms behind a 60ms scrim lead and leaves at 160ms. `prefers-reduced-motion`
+degrades, never removes.
+
+**WHY** Arriving is worth watching and leaving is not: the visitor has already
+decided, and a slow exit reads as an obstacle.
+
+**CODE** `css/tokens.css § "Motion"`; `css/form.css § "the dialog"`;
+`css/shell.css § "language listbox"`; `css/reset.css § prefers-reduced-motion`;
+`campaign/main.js § "Rules that still apply"`.
+
+**REJECTED** Per-component curves and durations. `tw-flip-cards-lp` carried five
+plus a section that rewrote all of them under reduced motion.
+
+The 60ms lead means the room dims first and then the thing arrives — one
+property, and the whole difference between a modal appearing and a modal being
+presented. `overlay` and `display` are transitioned with `allow-discrete`, which
+is what lets a top-layer element animate out at all; `@starting-style` supplies
+the "before" the browser otherwise has none of. A visitor who asked for less
+motion did not ask for less feedback.
+
+---
+
+## 10. The asset pipeline
+
+**DECISION** `raw/` holds the sources and is gitignored; `tools/optimize.py`
+writes AVIF and WebP into `assets/img/` and the **outputs** are committed. Run
+by hand, never at deploy time. That is the whole build system.
+
+**WHY** A sibling repo shipped 22 MB of raw renders to a public GitHub repo and
+they stayed downloadable from raw.githubusercontent.com long after the Pages
+site was cleaned.
+
+**CODE** `tools/optimize.py § module docstring`; `.gitignore`;
+`references/art.md`.
+
+**REJECTED** Shipping the Figma PNG: one 1.7 MB export became a 23 KB AVIF and
+looks the same. Also rejected: a build step — the published site is these files.
+
+Both formats ship because AVIF is roughly a fifth the size at the same quality
+and WebP covers the rest; the AVIF `<source>` goes first and the widest media
+query first, because first match wins and reversing it downloads the 375px crop
+to every desktop. Transparency is flattened onto `--navy-950` unless
+`--keep-alpha` is passed.
+
+---
+
+## 11. The form-submission seam
+
+**DECISION** The form is connected to IT's platform by default (since v1.0.7,
+2026-10-08). `campaign.js` sets `form.onRegister` to `TWPlatform.register`, and
+`js/platform.js` does the rest: config, landing, reCAPTCHA, the registration
+POST and the SSO hand-off. Three routes remain in precedence order:
+`form.onRegister(payload)` if it is a function, else `form.endpoint` as a JSON
+POST, else nothing. The validated payload goes to `console.info` and, with
+`form.demoDone`, the confirmation screen is walked anyway. With no `config.json`,
+`js/platform.js` takes that demo path itself and writes a console warning.
+
+**WHY** A new Topwin LP must start connected, not wired by hand. IT's LP is
+live and confirmed to deliver registrations to the platform, so the template
+copies its behaviour (§15). The demo path survives so the page stays demoable
+without a config. It is never silent: `js/platform.js` writes
+`[platform] config.json not found` to the console when it takes it.
+
+**CODE** `js/platform.js` (copied byte-for-byte from tw-flip-cards-lp
+`0186bc6`); `js/form.js § "submit"` and `§ "the confirmation screen"`;
+`campaign.js § "The registration form"` and `§ "The IT platform"`.
+
+**REJECTED** A plain HTML `action=` route alongside the JS one, which
+`tw-flip-cards-lp` offered — the confirmation screen simply never appeared on
+one of the two. Also rejected: `form-action` in the CSP, which does **not** fall
+back to `default-src`; leaving it out is what keeps the form free to POST
+wherever IT wires the endpoint, and adding it would break that wiring on the day
+it happens. The SSO hand-off POSTs to the origin of the `redirectUrl` that the
+registration response returns (for TopWin, the tracker mirror), or to the host
+of the landing's `rules` URL when there is none. Both are named at runtime, so
+`form-action` stays out; README-IT section 3 tells IT which origin to allow if
+they add it (see CAMPAIGN.md, "Connect to IT").
+
+The password is in the payload, because a registration hook without one is
+useless — which is exactly why `endpoint` must point at the operator's own TLS
+endpoint and nowhere else. Both credential values are written with
+`textContent`, never `innerHTML`.
+
+---
+
+## 12. The analytics seam
+
+**DECISION** With the platform connected, GA, Yandex Metrika and GTM load from
+the landing response, through `js/platform.js` (§15). `analytics.gtmId` and
+`analytics.metaPixelId` in `campaign.js` are still read by `js/shell.js`, and
+both empty is still the shipped default: then the shell injects nothing.
+`TW.track()` always runs and is a no-op without an id.
+
+**WHY** The CSP in `index.html` names the analytics origins because IT's
+landing response carries their IDs. The shell's own injection is kept for a tag
+IT does not load. Meta's origin is not in the CSP, so `metaPixelId` is refused
+there, silently.
+
+**CODE** `js/shell.js § injectAnalytics()` and `§ track()`;
+`index.html § CSP comment block`; `campaign.js § "Analytics"` and
+`§ "Tracking and affiliate"`.
+
+**REJECTED** Putting the CSP swap in `campaign.js`. A `<meta>` policy cannot be
+written from JavaScript, so a campaign that needs a tag outside the CSP's list
+edits the `<meta>` in `index.html`. A refusal appears only in the console, so
+the page looks fine and silently sends nothing.
+
+Also rejected: reading the passthrough lazily at click time. It is read once at
+boot, because a mechanic may replace the query string with history state and the
+affiliate click id has to survive that. `passthrough` is how an affiliate id
+survives the landing page at all; neither earlier landing had it, and the ids
+were lost. Meta's snippet is transcribed rather than eval'd from a string, so
+`script-src` stays free of `'unsafe-inline'`.
+
+---
+
+## 13. Deployment
+
+**DECISION** GitHub Pages from GitHub Actions. Guards run on every push **and
+every pull request**; build and deploy only on `main`. The build stages an
+explicit `cp` allowlist into `_site` — `index.html campaign.js .nojekyll css js
+campaign assets` — never `cp -r .`.
+
+**WHY** In the landing this workflow is taken from the guards lived inside the
+build job, which only ran after a merge, so every guard reported a problem that
+was already on `main`; that is how the hryvnia bug reached production.
+
+**CODE** `.github/workflows/pages.yml`; `.gitignore`; `.nojekyll`.
+
+**REJECTED** `cp -r .`, one careless commit away from publishing whatever lands
+in the repo — `tools/`, `docs/`, `raw/` and the dotfiles must 404 on the live
+URL. Also rejected: leaving the repository's Pages source on a branch, where the
+legacy Jekyll builder succeeds, publishes the whole repository, bypasses the
+allowlist entirely, and nothing warns you. That one is a settings change, not a
+code change: see `references/checklist.md`.
+
+## 14. Browser support
+
+**DECISION** The floor is **Chrome/Edge 105+, Safari 16+, Firefox 110+**. Above
+**Chrome/Edge 117+, Safari 17.4+, Firefox 129+** the dialog also animates in.
+Nothing below the floor is tested and nothing below it is claimed.
+
+**WHY** Four features set it, and only one of them fails hard:
+
+| feature | where | floor | below it |
+|---|---|---|---|
+| `<dialog>` + `showModal()` + `::backdrop` | `css/form.css`, `js/form.js` | Safari 15.4 | the pop-up does not open — hard fail |
+| `container: … / size` + `@container` | `css/stage.css` only | Chrome 105 / Safari 16 / Firefox 110 | the landscape footer-drop never applies; the page still works |
+| `@starting-style` + `transition-behavior: allow-discrete` | `css/form.css` | Chrome 117 / Safari 17.4 / Firefox 129 | the dialog appears without its entry animation |
+| `backdrop-filter` | `css/shell.css`, `css/form.css` | Chrome 76 / Safari 9 / Firefox 103 | the header bar is a flat colour |
+
+So the container query in `css/stage.css` is what actually sets the floor, and
+only a stage-mode campaign carries it. A scrolling campaign runs on Safari 15.4.
+
+**CODE** `css/form.css § "the dialog"`; `css/stage.css § "short and wide"`;
+`css/shell.css § "header"`.
+
+**REJECTED** Feature-detecting any of these. `@starting-style` and
+`backdrop-filter` degrade by themselves and need no code; the container query
+does not degrade, but the campaigns that use it are the ones the team tests on
+device anyway. A `@supports` fork would be a second layout to maintain for
+browsers nobody has reported.
+
+**NOT VERIFIED** Nobody has run this on a browser at the floor. The numbers
+above are read off the features, not off a device. `references/checklist.md`
+lists what cannot be closed from a desk; this belongs with it.
+
+---
+
+## 15. IT's LP is the reference
+
+**DECISION** Every Topwin LP copies the behaviour of IT's own landing
+(tw-flip-cards-lp at `0186bc6`, live at landings.top-win.promo/testnewland1243/,
+landing 12). Where the template and IT's LP disagree on the platform, IT's LP
+wins. Decided 2026-10-08.
+
+What is copied, and where it lives:
+
+- **Email only.** `js/platform.js` removes the phone tab, because the API is
+  `registration/email` and there is no phone route.
+- **clientIp** from `api.ipify.org`, sent in the registration body.
+- **The reCAPTCHA badge is hidden** (`css/form.css § .grecaptcha-badge`).
+- **Analytics** (GA, Yandex Metrika, GTM) from the landing response, loaded as
+  external `<script src>` only. IT's inline analytics scripts would be blocked
+  by our CSP without `'unsafe-inline'`, so `js/platform.js` appends the tags
+  instead and checks each ID first.
+- **SSO** via `res.data.redirectUrl`: the token goes to its mirror's
+  `/api/welcome` as `tmpToken`, with `redirect` = `redirectUrl` plus the page
+  query. Without `redirectUrl`, the fallback is the casino's `/api/welcome` with
+  `redirect_link`. The confirmation screen that shows a password is never
+  shown on success.
+
+**WHY** IT's flow is proven live: registrations reach their platform from
+landing 12. A template that drifts from it would be a second, untested flow.
+Every Topwin LP behaves the same, so a change to the platform is one change in
+one file, `js/platform.js`, which is a shared file under `tools/drift.py`.
+
+**CODE** `js/platform.js` (the whole flow, in its header comment);
+`tools/platform_test.py` (67 checks against `tools/platform_stub.py`);
+`index.html § CSP comment`.
+
+**REJECTED** Adapting IT's flow to the template's demo form. The demo form has
+a phone tab and an `endpoint` the platform does not use. Changing the flow to
+suit the form would make the registration body differ from IT's, and IT's API
+is the one that answers.
+
+**NOT VERIFIED** The redirect origin (`<mirror>` or the casino) is not verified
+against every landing. The CSP's `form-action` stays out, so the SSO origin
+is not restricted; see CAMPAIGN.md "Connect to IT".

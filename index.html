@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#040412">
+
+<!-- GitHub Pages cannot set response headers, so the policy ships as a meta.
+     It names exactly the origins js/platform.js and the shell talk to, and
+     nothing wider:
+
+       script-src   www.google.com/recaptcha/ and www.gstatic.com/recaptcha/ --
+                    reCAPTCHA v3 loads api.js from the first and its runtime
+                    from the second.
+       frame-src    www.google.com/recaptcha/ -- the invisible challenge frame.
+       connect-src  'self' (config.json), the platform API, api.ipify.org (the
+                    visitor IP the platform's body carries) and
+                    www.google.com/recaptcha/.
+       analytics    script-src and connect-src, img-src and frame-src name
+                    GA, GTM and Yandex Metrika. The landing response carries
+                    their IDs and js/platform.js injects their tags, as IT's
+                    LP does. GTM loads whatever tags IT's container holds,
+                    and those may need more domains here. Only the console on
+                    the first real test shows which.
+
+     connect-src allows the TopWin production API and the Jackpot dev API,
+     used only on localhost / land-crm (campaign.js § platform.dev).
+
+     form-action is still absent, on purpose, so the SSO hand-off is not
+     restricted. It POSTs to the origin of the redirectUrl that the
+     registration response returns (for TopWin, the tracker mirror), or to the
+     host of the landing's data.rules when there is no redirectUrl. Both come
+     from the API at runtime and are not knowable here. If you add
+     `form-action 'self' https://<that origin>`, allow exactly that origin, not
+     the casino domain -- a wrong value would block the redirect silently.
+
+     style-src carries 'unsafe-inline' for two real reasons, not laziness: the
+     noscript fallback near the end of this head is an inline style block, and
+     js/flip.js sets style attributes -- the stagger index on each winning card
+     and will-change on a card mid-flip. Without it the no-JS fallback and the
+     reveal stagger both break, and they break SILENTLY: a CSP violation shows
+     up in the console and nowhere else.
+
+     frame-ancestors is absent because browsers ignore it in a meta policy;
+     writing it here would only look like protection. -->
+<meta http-equiv="Content-Security-Policy"
+      content="default-src 'self'; script-src 'self' https://www.google.com/recaptcha/ https://www.gstatic.com/recaptcha/ https://www.googletagmanager.com https://mc.yandex.ru; style-src 'self' 'unsafe-inline'; img-src 'self' https://www.google-analytics.com https://www.googletagmanager.com https://mc.yandex.ru https://mc.yandex.com; font-src 'self'; connect-src 'self' https://api2-land-prod.top-win.promo https://api2-land-dev.jack-pot.tech https://api.ipify.org https://www.google.com/recaptcha/ https://www.google-analytics.com https://*.google-analytics.com https://*.analytics.google.com https://www.googletagmanager.com https://mc.yandex.ru https://mc.yandex.com; frame-src https://www.google.com/recaptcha/ https://mc.yandex.ru https://mc.yandex.com; base-uri 'none'; object-src 'none'">
+<meta name="referrer" content="strict-origin-when-cross-origin">
+
+<!-- Static, because a crawler and a link preview read the head before any
+     script runs. The <title> is also re-rendered per language by js/i18n.js
+     via data-i18n; this is the default-locale copy it starts from. -->
+<title data-i18n="title">Top Win</title>
+<meta name="description" content="">
+
+<!-- The brand icon, and it ships on every Top Win landing. Not the wordmark
+     in assets/img/logo-topwin.svg: that one is 247x44 of horizontal type and
+     is illegible at 16px. This is the square mark drawn for the tab.
+     Without this line the browser asks for /favicon.ico, which no campaign
+     ships and the deploy allowlist would not publish anyway -- a 404 in the
+     console of every visit. -->
+<link rel="icon" href="assets/img/favicon_topwin.svg" type="image/svg+xml">
+
+<!-- Fonts are discovered late: a face is only requested once a stylesheet has
+     been applied to text. Named here, they start with the stylesheets instead.
+
+     Two subsets, not one, and not because the default language is Ukrainian:
+     the first paint genuinely draws both scripts. The copy is Cyrillic; the
+     offer figures, the tab labels ("EMAIL") and the apostrophe in Заб’єш are
+     latin, and the Cyrillic range stops short of the apostrophe. The other six
+     woff2 — latin-ext, the italic cuts and the two hryvnia glyphs — stay
+     deferred: they belong to the dialog, which is closed at load. -->
+<link rel="preload" as="font" type="font/woff2" href="assets/fonts/roboto-cyrillic.woff2" crossorigin>
+<link rel="preload" as="font" type="font/woff2" href="assets/fonts/roboto-latin.woff2" crossorigin>
+
+<!-- Order matters: reset, then tokens, then the shell, then the campaign.
+
+     The page shape is the next line, and it is one of three:
+       neither link   an ordinary scrolling page. The default.
+       css/stage.css  a fixed full-screen stage. Nothing ever scrolls.
+       css/fold.css   the mechanic gets 92% of the screen, the page scrolls,
+                      and the footer starts below the fold.
+     Link AT MOST ONE of the two: they answer the same question, and whichever
+     loaded second would win. Each file's own header says what it costs. -->
+<link rel="stylesheet" href="css/reset.css">
+<link rel="stylesheet" href="css/tokens.css">
+<link rel="stylesheet" href="css/shell.css">
+<link rel="stylesheet" href="css/form.css">
+<!-- <link rel="stylesheet" href="css/stage.css"> -->
+<!-- <link rel="stylesheet" href="css/fold.css"> -->
+<link rel="stylesheet" href="campaign/main.css">
+
+<noscript><style>
+  /* The chrome and the dialog are injected by js/shell.js, so with scripting
+     off there is no header, no footer and no form. Say so rather than showing
+     a blank page — this is the honest floor, not a fallback experience. */
+  .tw-noscript {
+    margin: 0 auto;
+    padding: 48px 24px;
+    max-width: 40rem;
+    color: var(--text);
+    font-family: var(--font);
+    font-size: 18px;
+    line-height: 1.5;
+    text-align: center;
+  }
+</style></noscript>
+</head>
+<body>
+
+<!-- ═══ the shell ═══════════════════════════════════════════════
+     js/shell.js replaces these two markers with the header and the footer,
+     and appends the registration <dialog> to <body>. Do not put markup inside
+     them and do not rename the attributes: tools/smoke.py asserts that both
+     bars mounted and have a real box.
+
+     Under css/stage.css these are two of exactly three body children, and any
+     fourth becomes a fourth flex row. -->
+
+<div data-tw="header"></div>
+
+<!-- ═══ the campaign ════════════════════════════════════════════
+     THIS IS THE PART YOU REPLACE. Everything inside <main> belongs to
+     campaign/main.js and campaign/main.css.
+
+     Static markup here is the page's first paint and its largest contentful
+     element, so put the hero in the HTML rather than building it from script.
+     Strings carry data-i18n="key" and are rendered from the campaign `strings`
+     table in campaign.js; the text written inline is the default locale's, so
+     the right words paint before any script runs. -->
+
+<main id="tw-main">
+  <section class="cmp-demo">
+    <p class="cmp-demo__lead" data-i18n="demo.lead">Демо-механіка.</p>
+    <button class="cmp-demo__cta" type="button" data-i18n="demo.cta">ОТРИМАТИ БОНУС</button>
+  </section>
+</main>
+
+<div data-tw="footer"></div>
+
+<noscript>
+  <p class="tw-noscript">Для роботи сторінки потрібен JavaScript.<br>
+     This page needs JavaScript.</p>
+</noscript>
+
+<!-- ═══ scripts ═════════════════════════════════════════════════
+     `defer` keeps source order and runs everything before DOMContentLoaded,
+     which is the whole reason there is no bundler here: the order below IS the
+     dependency graph.
+
+       campaign.js       the config every other file reads
+       js/strings.js     the shell's copy and the locale table
+       js/i18n.js        the translation engine, reads both of the above
+       js/form.js        the dialog's behaviour
+       js/audio.js       the sound pool; before the shell, which asks it
+                         whether there is anything to mute
+       js/shell.js       builds the chrome and the dialog, then boots i18n
+       js/platform.js    the IT connection. After shell.js, because it reads
+                         the dialog that shell.js mounts
+       campaign/main.js  the mechanic, which only sees TW.ready()
+
+     A campaign adds its own <script defer> AFTER campaign/main.js. -->
+<script defer src="campaign.js"></script>
+<script defer src="js/strings.js"></script>
+<script defer src="js/i18n.js"></script>
+<script defer src="js/form.js"></script>
+<script defer src="js/audio.js"></script>
+<script defer src="js/shell.js"></script>
+<script defer src="js/platform.js"></script>
+<script defer src="campaign/main.js"></script>
+
+</body>
+</html>

@@ -1,0 +1,29 @@
+# Source art and unoptimised exports. tools/optimize.py turns raw/ into
+# assets/img/; the outputs are committed, the inputs are not.
+#
+# This is not tidiness. A previous repo in this family shipped 22 MB of raw
+# generation renders to a public GitHub repo, and they stayed downloadable from
+# raw.githubusercontent.com long after the Pages site was cleaned. The art is
+# reproducible from the recipes in docs/BRIEF.md; the blobs never need to be.
+raw/
+
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+_site/
+
+# The IT platform's config for THIS landing: the landing_id IT gave it, and
+# nothing else. Written on the server, never committed. A copied id from
+# another landing sends registrations there (CAMPAIGN.md step 4).
+config.json
+
+# tools/handoff.py writes the IT archive here. It is a build output of
+# committed files: reproducible in one command, and 400 kB of zip nobody
+# should be diffing.
+dist/
+
+.DS_Store
+Thumbs.db
+*.log
