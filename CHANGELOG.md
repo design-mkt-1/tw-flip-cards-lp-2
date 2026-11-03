@@ -6,6 +6,15 @@ here and a bump to `TEMPLATE-REV` in
 just code, also edits `references/decisions.md` in the same commit — same
 repo, same commit, same review, so the two cannot drift apart.
 
+## v1.0.13
+
+`handoff.py`: `--out` outside the repo no longer crashes. The archive was built
+and checked, then the final print called `Path.relative_to(ROOT)`, which raises
+ValueError for a path outside the repo. Both `handoff.py` and `optimize.py`
+(same pattern on `--out`) now print the repo-relative path when inside, the
+absolute path otherwise. Neither file is in `SHARED`, so SHARED.lock is
+unchanged. `TEMPLATE-REV` bumped.
+
 ## v1.0.12
 
 New opt-in switch `header.loginOpensForm` in `campaign.js` (default `false`).

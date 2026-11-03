@@ -250,6 +250,14 @@ def campaign_value(key):
     return value.rstrip(",").strip("'\"")
 
 
+def shown(path: Path) -> str:
+    """Repo-relative when inside the repo, absolute when --out points elsewhere."""
+    try:
+        return path.relative_to(ROOT).as_posix()
+    except ValueError:
+        return path.as_posix()
+
+
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("--out", default="dist", help="where to write the zip (default: dist)")
@@ -300,7 +308,7 @@ def main() -> int:
     assert not leaked, "handoff: the archive contains " + ", ".join(leaked)
 
     size = zip_path.stat().st_size
-    print(f"handoff: {zip_path.relative_to(ROOT).as_posix()} "
+    print(f"handoff: {shown(zip_path)} "
           f"— {len(names)} file(s), {size / 1024:.0f} kB")
     print("         staged: " + ", ".join(allowlist()))
     return 0

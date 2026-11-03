@@ -104,6 +104,14 @@ def convert(Image, src: Path, widths, keep_alpha: bool) -> int:
     return written
 
 
+def shown(path: Path) -> str:
+    """Repo-relative when inside the repo, absolute when --out points elsewhere."""
+    try:
+        return path.relative_to(ROOT).as_posix()
+    except ValueError:
+        return path.as_posix()
+
+
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("names", nargs="*", help="file names inside raw/img/ (default: all)")
@@ -139,7 +147,7 @@ def main() -> int:
         print(f"{src.name}  {src.stat().st_size // 1024} KB")
         total += convert(Image, src, widths, args.keep_alpha)
 
-    print(f"\noptimize: wrote {total} file(s) into {OUT.relative_to(ROOT).as_posix()}/")
+    print(f"\noptimize: wrote {total} file(s) into {shown(OUT)}/")
     return 0
 
 
