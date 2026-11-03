@@ -220,8 +220,12 @@ window.TW_CAMPAIGN = {
     payments:   ['visa', 'mastercard', 'tether', 'bitcoin']
   },
   /* header.auth: the "Вхід" (links.login) and "Реєстрація" (opens the card)
-     buttons in the bar. Default true; false leaves both out. */
-  header: { show: true, mute: false, lang: true, auth: true },
+     buttons in the bar. Default true; false leaves both out.
+     header.loginOpensForm: default false ("Вхід" is a link to links.login, no
+     href while unset). true makes "Вхід" a <button> that calls TW.openForm(),
+     the same as "Реєстрація". The in-form "Already have an account? Log in"
+     link is not affected. ON in this LP only. */
+  header: { show: true, mute: false, lang: true, auth: true, loginOpensForm: true },
 
   /* ── Sound ────────────────────────────────────────────────────
      name -> file, and empty is the shipped default: no Audio element is made,

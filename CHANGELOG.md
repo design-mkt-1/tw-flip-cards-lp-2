@@ -6,6 +6,17 @@ here and a bump to `TEMPLATE-REV` in
 just code, also edits `references/decisions.md` in the same commit — same
 repo, same commit, same review, so the two cannot drift apart.
 
+## v1.0.12
+
+New opt-in switch `header.loginOpensForm` in `campaign.js` (default `false`).
+Shared file changes: `js/shell.js`; SHARED.lock is regenerated. Default false
+renders exactly as before: "Вхід" is an `<a>` on `links.login`, no `href` while
+unset. When true, "Вхід" is a real `<button type="button">` with the same
+ghost style, wired like "Реєстрація" (delegated click, `TW.openForm()`), so it
+is keyboard-operable; the `cta_click` event carries `where: "header_login"`.
+The in-form "Already have an account? Log in" link (`data-tw-link="login"`) is
+unchanged. Same markup on the narrow header.
+
 ## v1.0.11
 
 Header/footer dimensions matched to Figma (42:3592 / 42:3650 wide, 42:3652 /

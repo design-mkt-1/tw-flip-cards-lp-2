@@ -209,9 +209,13 @@
     /* Log in and Register. `header.auth: false` leaves them out. Log in is an
        anchor on links.login and, like every unset link, has no href until
        wireLinks() finds one. Register is a button: it opens the card and
-       goes nowhere. */
+       goes nowhere. `header.loginOpensForm: true` makes Log in a button too,
+       opening the same card (default false: links.login, as before). */
     if (h.auth !== false) {
-      right += '<a class="tw-btn tw-btn--ghost" data-tw-link="login" data-i18n="hdr.login"></a>' +
+      right += (h.loginOpensForm === true
+                 ? '<button class="tw-btn tw-btn--ghost" type="button" data-tw-register data-tw-login ' +
+                   'data-i18n="hdr.login"></button>'
+                 : '<a class="tw-btn tw-btn--ghost" data-tw-link="login" data-i18n="hdr.login"></a>') +
                '<button class="tw-btn tw-btn--cta" type="button" data-tw-register ' +
                'data-i18n="hdr.register"></button>';
     }
@@ -457,7 +461,7 @@
     document.addEventListener('click', function (e) {
       var t = e.target.closest && e.target.closest('[data-tw-register]');
       if (!t) return;
-      track('cta_click', { where: 'header' });
+      track('cta_click', { where: t.hasAttribute('data-tw-login') ? 'header_login' : 'header' });
       window.TW.openForm();
     });
 

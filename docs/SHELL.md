@@ -49,6 +49,7 @@ layout, at and above it the wide one.
 | `header.lang` | Shows or hides the language button. It is also hidden when `languages` has one entry. |
 | `header.mute` | Shows the speaker, if `sounds` has clips. |
 | `header.auth` | Shows "Вхід" and "Реєстрація". Default true. |
+| `header.loginOpensForm` | Default false: "Вхід" is a link to `links.login`. True: "Вхід" is a `<button>` that calls `TW.openForm()`, like "Реєстрація". The in-form "Log in" link is unaffected. |
 | `brand.logoAlt` | The logo's alt text. |
 | `links.home` | Where the logo goes. Empty means it is not a link. |
 | `languages` | The languages and their order. The first is the default. |
