@@ -82,7 +82,7 @@ body {
 
 #tw-main {
   position: relative;
-  height: calc(92svh - var(--tw-hdr-h));
+  height: calc(92svh - var(--tw-hdr-h) - var(--tw-logorow-h, 0px));
   overflow: hidden;
   /* `/ size` so cqh and cqw INSIDE the mechanic mean "of the space the
      mechanic got". That is the campaign's unit to use or ignore -- the shell

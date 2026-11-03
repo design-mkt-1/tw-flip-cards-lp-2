@@ -36,7 +36,7 @@
 /* The bar's height is a variable because css/fold.css needs the same number:
    it sizes #tw-main as the screen minus this bar, and a second copy of 52
    somewhere else is a number that drifts the first time the design moves. */
-:root { --tw-hdr-h: 52px; }
+:root { --tw-hdr-h: 56px; }
 
 .tw-hdr {
   position: relative;
@@ -51,15 +51,47 @@
   gap: 10px;
   height: var(--tw-hdr-h);
   padding: 0 16px;
-  background: var(--chrome-bar);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border-bottom: 1px solid var(--chrome-hair);
+  background: linear-gradient(90deg, var(--hdr-from), var(--hdr-to));
+  box-shadow: var(--hdr-shadow);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
 }
 
-.tw-hdr__logo img { height: 22px; width: auto; }
+/* The gold hairline under the bar (Figma "Gold line"): transparent at both
+   ends, brightest in the middle. */
+.tw-hdr::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 1px;
+  background: linear-gradient(90deg, var(--gold-line-0), var(--gold-line-peak), var(--gold-line-0));
+  pointer-events: none;
+}
 
-.tw-hdr__right { display: flex; align-items: center; gap: 8px; }
+/* Wide: the logo is in the bar. Narrow: it moves to .tw-logorow below. */
+.tw-hdr__logo { display: none; }
+.tw-hdr__logo img,
+.tw-logorow__logo img { display: block; height: 32px; width: auto; }
+
+/* The logo row: narrow screens only. Logo centred under the controls, above
+   the page (Figma 42:3651). Its height is a variable because css/fold.css
+   subtracts it from the mechanic. */
+:root { --tw-logorow-h: 60px; }
+.tw-logorow {
+  flex: 0 0 auto;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: var(--tw-logorow-h);
+  padding-top: 8px;
+}
+
+/* Narrow: controls only. Language on the left, auth on the right -- the
+   auto margin on the first auth button pushes the pair to the end. */
+.tw-hdr__right { display: flex; flex: 1 1 auto; align-items: center; gap: 8px; min-width: 0; }
+.tw-hdr__right > .tw-btn--ghost { margin-left: auto; }
 
 /* 44px controls with a 16px label: the design draws 32px pills with 13px
    text, which misses the tap target iOS asks for by 12px. */
@@ -69,14 +101,14 @@
   align-items: center;
   gap: 8px;
   height: 44px;
-  padding: 0 16px;
-  border-radius: var(--r-pill);
+  padding: 0 14px;
+  border-radius: var(--r-md);
   border: 1px solid var(--chrome-ctl-brd);
-  background: var(--chrome-ctl);
+  background: var(--chrome-hair);
   color: var(--text);
   font-family: var(--font);
   font-weight: var(--fw-semi);
-  font-size: 16px;
+  font-size: 15px;
   transition: scale 140ms var(--ease-out);
 }
 
@@ -98,10 +130,7 @@
 .tw-mute[aria-pressed="true"] .tw-mute__on  { display: none; }
 .tw-mute[aria-pressed="true"] .tw-mute__off { display: block; }
 
-/* The accent outline is the design's treatment for this trigger and the label
-   stays white against it: the outline already says which control it is, and
-   an accent-coloured label on an accent outline says it twice. */
-.tw-lang { border-color: var(--accent); color: var(--white); }
+.tw-lang { color: var(--white); }
 .tw-lang__caret { width: 14px; height: 14px; transition: transform 180ms var(--ease-out); }
 .tw-lang[aria-expanded="true"] .tw-lang__caret { transform: rotate(180deg); }
 
@@ -109,11 +138,46 @@
    qualified on [href] because it only becomes a link when links.home is set
    in campaign.js -- a mark that shrinks under the thumb and then does nothing
    reads as a broken control rather than as a logo. */
+/* Log in / Sign up. Real <a> and <button>, 44px tall, same radius as the
+   language pill. Sign up keeps Orange Fire and takes dark ink: white on it is
+   3.44:1. */
+.tw-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  height: 44px;
+  padding: 0 14px;
+  border-radius: var(--r-md);
+  font-family: var(--font);
+  font-size: 14px;
+  white-space: nowrap;
+  text-decoration: none;
+  cursor: pointer;
+  transition: scale 140ms var(--ease-out);
+}
+.tw-btn--ghost {
+  border: 1px solid var(--btn-ghost-brd);
+  background: none;
+  color: var(--white);
+  font-weight: var(--fw-semi);
+}
+.tw-btn--cta {
+  border: 0;
+  background: var(--accent);
+  color: var(--accent-ink);
+  font-weight: var(--fw-bold);
+  box-shadow: var(--btn-glow);
+}
+.tw-btn:active,
 .tw-mute:active,
 .tw-lang:active,
-.tw-hdr__logo[href]:active { scale: .95; }
+.tw-hdr__logo[href]:active,
+.tw-logorow__logo[href]:active { scale: .95; }
 
 .tw-hdr__logo:focus-visible,
+.tw-logorow__logo:focus-visible,
+.tw-btn:focus-visible,
 .tw-mute:focus-visible,
 .tw-lang:focus-visible {
   outline: 2px solid var(--accent);
@@ -225,12 +289,9 @@
 
 
 /* ══ footer ═══════════════════════════════════════════════════
-   Figma 19:3717 (mobile) and 19:3624 (desktop). Two arrangements, not two
-   sizes: mobile stacks the payments over a rule over the copyright; desktop
-   puts the logo and the copyright left and the payments right, for a third
-   less height. Both are implemented and the wide one applies as soon as there
-   is room, because on a stage-mode page that height is height the mechanic
-   keeps. */
+   Figma 42:3712 (narrow) and 42:3650 (wide). Narrow: payments, a rule, the
+   copyright, all centred. Wide: logo left, the copyright, then the payments
+   with their label above. A gold hairline sits on top of both. */
 
 .tw-ftr {
   position: relative;
@@ -239,14 +300,14 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 16px;
-  padding: 20px 24px 16px;
-  background: var(--footer-bg);
+  padding: 40px 24px 32px;
+  background: linear-gradient(180deg, var(--ftr-from), var(--ftr-to));
+  border-top: 1px solid var(--gold-line-edge);
+  box-shadow: var(--ftr-shadow);
   color: var(--footer-fg);
   text-align: center;
 }
 
-/* The logo plate belongs to the desktop arrangement only. */
 .tw-ftr__logo { display: none; }
 
 .tw-ftr__pay { display: flex; flex-direction: column; align-items: center; gap: 12px; }
@@ -283,12 +344,12 @@
 .tw-ftr__mark--visa { width: 74px; }
 .tw-ftr__mark--mc   { width: 39px; }
 
-/* The rule between the payments and the copyright is a border on the
-   copyright rather than an element of its own: the flex gap above it already
-   supplies the space the design puts on that side. */
+/* The rule between the payments and the copyright is the copyright's own top
+   border, with 32px of air on each side of it. */
 .tw-ftr__copy {
   width: 100%;
-  padding-top: 16px;
+  margin-top: 32px;
+  padding-top: 32px;
   border-top: 1px solid var(--footer-brd);
   font-size: 12px;
   font-weight: var(--fw-regular);
@@ -299,53 +360,45 @@
    19:3624 for the footer, and the taller header bar, at one breakpoint. */
 
 @media (min-width: 700px) {
-  :root { --tw-hdr-h: 64px; }
-  .tw-hdr { padding: 0 clamp(16px, 3vw, 30px); }
-  .tw-hdr__logo img { height: 28px; }
+  :root { --tw-hdr-h: 72px; --tw-logorow-h: 0px; }
+  .tw-hdr { padding: 0 clamp(16px, 6.25vw, 120px); }
+  .tw-logorow { display: none; }
+
+  .tw-hdr__logo { display: block; }
+  .tw-hdr__right { flex: 0 0 auto; gap: 12px; }
+  .tw-hdr__right > .tw-btn--ghost { margin-left: 0; }
+  .tw-hdr__logo img { height: 36px; }
+
+  .tw-btn { padding: 0 22px; font-size: 15px; }
 
   .tw-ftr {
     flex-direction: row;
     align-items: center;
     justify-content: space-between;
     gap: 40px;
-    padding: 24px clamp(24px, 6.25vw, 120px) 20px;
+    padding: 48px clamp(24px, 6.25vw, 120px) 40px;
     text-align: left;
   }
 
-  /* The logo is orange and navy, and the navy half of it disappears on
-     --footer-bg -- which is why the design stands it on a white plate here
-     and leaves it out of the mobile node altogether. */
-  .tw-ftr__logo {
-    display: flex;
-    flex: none;
-    align-items: center;
-    justify-content: center;
-    width: 110px;
-    height: 24px;
-    padding: 3.4px 8.2px;
-    border-radius: 4px;
-    background: var(--white);
-    filter: var(--plate-shadow);
-  }
+  /* The logo is the new one, white box and all, so it needs no plate. */
+  .tw-ftr__logo { display: block; flex: none; order: 1; }
+  .tw-ftr__logo img { display: block; width: auto; height: 28px; }
 
-  .tw-ftr__logo img { width: 96px; height: 17px; }
-
-  /* The two nodes disagree about order, so the DOM carries the mobile one --
-     payments, then copyright -- and this layout restates its own. Reading
-     order and visual order match in both, which is the reason to do it here
-     rather than by moving the markup and pushing the mismatch onto mobile. */
-  .tw-ftr__logo { order: 1; }
+  /* The DOM carries the narrow order -- payments, then copyright -- and this
+     layout restates its own, so reading order and visual order match. */
   .tw-ftr__copy { order: 2; }
   .tw-ftr__pay  { order: 3; }
 
   .tw-ftr__copy {
     flex: 1 0 0;
     width: auto;
+    margin-top: 0;
     padding-top: 0;
     border-top: 0;
     font-size: 14px;
+    text-align: right;
   }
 
-  .tw-ftr__pay   { align-items: flex-end; gap: 16px; }
-  .tw-ftr__label { font-size: 14px; text-align: right; }
+  .tw-ftr__pay   { align-items: flex-start; gap: 16px; }
+  .tw-ftr__label { font-size: 14px; text-align: left; }
 }

@@ -206,12 +206,32 @@
                options + '</ul></div>';
     }
 
+    /* Log in and Register. `header.auth: false` leaves them out. Log in is an
+       anchor on links.login and, like every unset link, has no href until
+       wireLinks() finds one. Register is a button: it opens the card and
+       goes nowhere. */
+    if (h.auth !== false) {
+      right += '<a class="tw-btn tw-btn--ghost" data-tw-link="login" data-i18n="hdr.login"></a>' +
+               '<button class="tw-btn tw-btn--cta" type="button" data-tw-register ' +
+               'data-i18n="hdr.register"></button>';
+    }
+
+    var alt = esc(b.logoAlt || 'Top Win');
+    function logo(cls) {
+      return '<a class="' + cls + '" data-tw-link="home" aria-label="' + alt + '">' +
+             '<img src="' + esc(b.logo) + '" alt="' + alt + '" width="161" height="32">' +
+             '</a>';
+    }
+
+    /* Two logos, one visible at a time. Wide: in the bar, at left. Narrow: the
+       bar is only the controls and the logo sits centred on its own row below
+       it (Figma 42:3651). The other one is display:none, so a screen reader
+       meets it once. */
     return '<header class="tw-hdr">' +
-           '<a class="tw-hdr__logo" data-tw-link="home" aria-label="' + esc(b.logoAlt || 'Top Win') + '">' +
-           '<img src="' + esc(b.logo) + '" alt="' + esc(b.logoAlt || 'Top Win') + '" width="120" height="21">' +
-           '</a>' +
+           logo('tw-hdr__logo') +
            '<div class="tw-hdr__right">' + right + '</div>' +
-           '</header>';
+           '</header>' +
+           '<div class="tw-logorow">' + logo('tw-logorow__logo') + '</div>';
   }
 
   var PAY = {
@@ -233,7 +253,7 @@
        arrangement restates its own order in CSS, so reading order and visual
        order match in both. */
     return '<footer class="tw-ftr">' +
-           '<span class="tw-ftr__logo"><img src="' + esc(b.logo) + '" alt="" width="96" height="17"></span>' +
+           '<span class="tw-ftr__logo"><img src="' + esc(b.logo) + '" alt="" width="140" height="28"></span>' +
            '<div class="tw-ftr__pay">' +
            '<p class="tw-ftr__label" data-i18n="footer.pay"></p>' +
            '<ul class="tw-ftr__marks">' + marks + '</ul>' +
@@ -431,6 +451,15 @@
     document.body.insertAdjacentHTML('beforeend', dialogHTML());
 
     if (window.TWForm) TWForm.mount(document.getElementById('tw-signup'));
+
+    /* Register in the header. Delegated, so it survives the mount order and
+       a campaign that re-renders the bar. TW.openForm is the one seam. */
+    document.addEventListener('click', function (e) {
+      var t = e.target.closest && e.target.closest('[data-tw-register]');
+      if (!t) return;
+      track('cta_click', { where: 'header' });
+      window.TW.openForm();
+    });
 
     /* The mute button. It was rendered here and wired in each campaign, which
        is one campaign away from a speaker that does nothing -- so the shell

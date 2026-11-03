@@ -231,6 +231,22 @@
                                                  oldest iOS this runs on. */
   --plate-shadow:    drop-shadow(0 1.4px .7px rgba(0, 0, 0, .25));
 
+  /* v1.0.9 header and footer, Figma 42:3627 / 42:3650 / 42:3712. The bar is a
+     navy gradient with a gold hairline under it; the footer is the same navy
+     going darker, with the hairline on top. The gold is the design's
+     (rgb 242 193 78) and is used here and nowhere else. */
+  --hdr-from:        rgba(8, 19, 64, .92);
+  --hdr-to:          rgba(5, 11, 42, .92);
+  --hdr-shadow:      0 8px 24px rgba(0, 0, 13, .45);
+  --gold-line-0:     rgba(242, 193, 78, 0);
+  --gold-line-peak:  rgba(242, 193, 78, .7);
+  --gold-line-edge:  rgba(242, 193, 78, .45);
+  --ftr-from:        #0a1745;
+  --ftr-to:          #040920;
+  --ftr-shadow:      0 -10px 15px rgba(0, 0, 0, .4);
+  --btn-ghost-brd:   rgba(255, 255, 255, .35);
+  --btn-glow:        0 6px 16px rgba(255, 69, 0, .35);   /* --orange-500 at 35% */
+
   /* ── Semantic ─────────────────────────────────────────────────
      What the rest of the stylesheets are allowed to ask for. Nothing outside
      this file reaches for a ramp step by number; when it did, the colour

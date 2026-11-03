@@ -11,8 +11,9 @@
    numbers by --u; the small text that carries the instructions has a px floor
    so browser zoom and tiny windows do not shrink it into illegibility.
 
-     mobile   artboard 375 x 566      (frame 375 wide; the Figma logo row is the
-                                       shell header here, so this is what is left)
+     mobile   artboard 375 x 580      (frame 375 wide; the shell header is now a bar plus a
+                                       logo row, 116px, so this is what is left; 580 holds the
+                                       win state with the claim button at 360x640)
      desktop  artboard 1920 x 940     (Figma hero is 1920x972 under a 108px header; the
                                        shell header is 64px, so 1080 leaves 930 and the
                                        artboard is 940 to keep --u at ~.99)
@@ -39,12 +40,12 @@
 }
 
 .cmp-stage {
-  --u: min(calc(100cqw / 375), calc(100cqh / 566));
+  --u: min(calc(100cqw / 375), calc(100cqh / 580));
   --cu: calc(var(--u) * .306);                 /* one unit of the 272x381 card */
   position: relative;
   z-index: 1;
   width: calc(375 * var(--u));
-  height: calc(566 * var(--u));
+  height: calc(580 * var(--u));
   margin: 0 auto;
   display: flex;
   flex-direction: column;

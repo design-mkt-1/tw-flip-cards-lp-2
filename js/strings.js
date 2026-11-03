@@ -56,6 +56,8 @@ var TW_STRINGS = (function () {
     ua: {
       'hdr.sound':          'Увімкнути або вимкнути звук',
       'hdr.lang':           'Мова',
+      'hdr.login':          'Вхід',
+      'hdr.register':       'Реєстрація',
 
       'promo.title':        'Вітальний спортивний бонус',
       'promo.pct':          '{percent}',
@@ -115,6 +117,8 @@ var TW_STRINGS = (function () {
     ru: {
       'hdr.sound':          'Включить или выключить звук',
       'hdr.lang':           'Язык',
+      'hdr.login':          'Вход',
+      'hdr.register':       'Регистрация',
 
       'promo.title':        'Приветственный спортивный бонус',
       'promo.pct':          '{percent}',
@@ -166,6 +170,8 @@ var TW_STRINGS = (function () {
     en: {
       'hdr.sound':          'Toggle sound',
       'hdr.lang':           'Language',
+      'hdr.login':          'Log in',
+      'hdr.register':       'Sign up',
 
       'promo.title':        'Welcome sports bonus',
       'promo.pct':          '{percent}',

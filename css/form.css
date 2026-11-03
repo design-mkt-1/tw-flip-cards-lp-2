@@ -228,7 +228,7 @@
   text-align: center;
 }
 
-.tw-promo__logo { width: 101px; height: 18px; }
+.tw-promo__logo { width: auto; height: 20px; }
 
 .tw-promo__head {
   display: flex;
@@ -762,7 +762,7 @@
   .tw-card { padding: 36px; }
 
   .tw-promo { gap: 24px; }
-  .tw-promo__logo  { width: 247px; height: 44px; }
+  .tw-promo__logo  { width: auto; height: 49px; }
   .tw-promo__title     { font-size: 24px; }
   .tw-promo__pct       { font-size: 100px; }
   .tw-promo__pct--long { font-size: 60px; }

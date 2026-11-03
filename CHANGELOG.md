@@ -6,6 +6,29 @@ here and a bump to `TEMPLATE-REV` in
 just code, also edits `references/decisions.md` in the same commit — same
 repo, same commit, same review, so the two cannot drift apart.
 
+## v1.0.9
+
+Header, footer and logo redrawn from Figma (nodes 42:3591 wide, 42:3651 narrow,
+logo 42:21607). Shared files change: `css/tokens.css`, `css/shell.css`,
+`css/fold.css`, `css/form.css`, `js/shell.js`, `js/strings.js`; SHARED.lock
+is regenerated.
+
+- Header: language pill, "Вхід" (outline, `links.login`; no href while it is
+  empty) and "Реєстрація" (orange, `TW.openForm()`). On narrow screens the bar
+  holds only those controls and the logo moves to its own centred row below
+  it (`.tw-logorow`, built by the shell). Navy gradient bar with a gold
+  hairline.
+- New switch `header.auth` in `campaign.js` (default true): false leaves both
+  buttons out.
+- New strings `hdr.login` and `hdr.register` (ua / ru / en).
+- Footer: gradient with a gold top edge; wide = logo, copyright (right-aligned),
+  then the payments label over the icons; narrow = payments, rule, copyright.
+- New logo (`assets/img/logo-topwin.svg`, same path) from Figma; the white
+  plate behind the footer logo is gone. The registration card's logo is sized
+  by height now (20px / 49px) because the artwork is 5.0:1, not 5.6:1.
+- `css/fold.css` subtracts `--tw-logorow-h` as well as `--tw-hdr-h`.
+- Header bar is 56px narrow / 72px wide (was 52 / 64); the buttons are 44px.
+
 ## v1.0.8
 
 Text only: no behaviour changes. README-IT and the comments told IT four wrong

@@ -219,7 +219,9 @@ window.TW_CAMPAIGN = {
     themeColor: '#040412',                    // --navy-950
     payments:   ['visa', 'mastercard', 'tether', 'bitcoin']
   },
-  header: { show: true, mute: false, lang: true },
+  /* header.auth: the "Вхід" (links.login) and "Реєстрація" (opens the card)
+     buttons in the bar. Default true; false leaves both out. */
+  header: { show: true, mute: false, lang: true, auth: true },
 
   /* ── Sound ────────────────────────────────────────────────────
      name -> file, and empty is the shipped default: no Audio element is made,

@@ -18,9 +18,13 @@ layout, at and above it the wide one.
 
 *1280px, wide layout. Logo at left, the language button at right.*
 
-- **Bar:** 52px tall below 700px, 64px at 700px and above.
-- **Logo:** 22px tall on mobile, 28px on wide. The logo is the brand's own file.
+- **Bar:** 56px tall below 700px, 72px at 700px and above, with a gold hairline under it.
+- **Logo:** 36px tall in the bar on wide. Below 700px it leaves the bar and sits
+  centred on its own 60px row under it (32px tall). The logo is the brand's own file.
 - **Language button:** 44px tall, a globe, the current code (UA / RU / EN), a caret.
+- **Вхід / Реєстрація:** 44px tall. "Вхід" is an outline link to `links.login`
+  (no `href` while it is empty). "Реєстрація" is the orange button; it calls
+  `TW.openForm()`.
 
 ![Header at 375px](img/header-375.png)
 
@@ -41,10 +45,11 @@ layout, at and above it the wide one.
 | `header.show` | Hides the whole header. |
 | `header.lang` | Shows or hides the language button. It is also hidden when `languages` has one entry. |
 | `header.mute` | Shows the speaker, if `sounds` has clips. |
+| `header.auth` | Shows "Вхід" and "Реєстрація". Default true. |
 | `brand.logoAlt` | The logo's alt text. |
 | `links.home` | Where the logo goes. Empty means it is not a link. |
 | `languages` | The languages and their order. The first is the default. |
-| `strings` | The words: `hdr.lang`, `hdr.sound`, per locale. |
+| `strings` | The words: `hdr.lang`, `hdr.sound`, `hdr.login`, `hdr.register`, per locale. |
 
 ### What a campaign may NOT change
 
@@ -58,16 +63,16 @@ landing, so it goes into the template, not into one campaign.
 
 ![Footer at 1280px](img/footer-1280.png)
 
-*1280px, wide layout. Logo on a white plate at left, payment marks and the copyright at right.*
+*Wide layout. Logo at left, then the copyright, then the payments label over the marks.*
 
 ![Footer at 375px](img/footer-375.png)
 
-*375px, mobile layout. The payment marks, then the copyright. There is no logo.*
+*375px, mobile layout. The payment marks, a rule, then the copyright. There is no logo.*
 
-- **Wide:** one row. The logo sits on a white plate, because its navy half would
-  disappear on the navy footer. Padding 24px top and 20px bottom.
-- **Mobile:** a column. The payment marks come first, then the copyright. The
-  logo is left out.
+- **Wide:** one row. Logo (28px, no plate), the copyright right-aligned, then the
+  payments column: label above the marks. Padding 48px top and 40px bottom.
+- **Mobile:** a column, centred. The payment marks, a rule, then the copyright.
+  The logo is left out. Both have a gold hairline on the top edge.
 - **Payment marks:** 24px tall in a 36px badge. Visa, Mastercard, Tether and
   Bitcoin, drawn from the shared icons.
 
@@ -84,7 +89,7 @@ not in the shell.
 
 ### What a campaign may NOT change
 
-The layout, the two arrangements, the mark sizes, the white plate and the logo.
+The layout, the two arrangements, the mark sizes and the logo.
 The footer's logo is the brand's, and so are the payment icons.
 
 ---

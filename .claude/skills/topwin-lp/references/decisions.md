@@ -208,9 +208,10 @@ aspect ratios, and a rule that fits the Visa wordmark stretches the round ones.
 Also rejected: a social row, which the design team removed when they redrew the
 footer.
 
-The logo is orange and navy and its navy half disappears on `--footer-bg`,
-which is why the design stands it on a white plate in the wide node and leaves
-it out of the mobile one.
+The logo (v1.0.9) is the one with its own white box around "WIN", so it reads
+on the navy footer without a plate; the wide node carries it at 28px and the
+mobile node leaves it out. The footer's top edge is a gold hairline, and the
+mobile node puts a rule between the payments and the copyright.
 
 ---
 
