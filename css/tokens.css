@@ -253,11 +253,11 @@
      stopped tracking the brand and had to be chased down by hand later. */
   --accent:        var(--orange-500);
   --accent-press:  var(--orange-600);
-  /* Ink on the accent. The design sets white, which is 3.44:1 on Orange Fire --
-     under AA on the one control the whole page exists to get pressed. Dark ink
-     clears it comfortably and, unlike a darker button, leaves the hero colour
-     exactly as the brandbook specifies it. */
-  --accent-ink:    var(--bg-dark);    /* design: white on orange, 3.44:1 */
+  /* Ink on the accent. White, as the design draws it. That is 3.44:1 on Orange
+     Fire, under AA -- a deliberate owner override (decision 2026-11-03: white
+     on orange per Figma), recorded in references/decisions.md. Every orange
+     button reads this token; change it here and nowhere else. */
+  --accent-ink:    var(--white);      /* owner decision 2026-11-03: white on orange per Figma */
   --accent-soft:   var(--orange-300); /* tints of the accent, for gradients */
   --second:        var(--navy-500);
   --second-soft:   var(--navy-200);   /* legible on the navy glass plate */

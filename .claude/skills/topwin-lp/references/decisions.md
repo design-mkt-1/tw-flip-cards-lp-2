@@ -57,8 +57,12 @@ small text, and they are brand colours — so the fix is a token, not a redraw.
 | `#737b8c` consent text, inactive tab | white | 4.25 | `--text-muted` → `--txt-secondary` `#5f6673` |
 
 The fifth is the control the page exists to get pressed: the design sets white
-on Orange Fire, 3.44:1. `--accent-ink` puts dark ink on it, which clears AA and
-— unlike darkening the button — leaves the hero colour exactly as specified.
+on Orange Fire, 3.44:1. Up to v1.0.9 `--accent-ink` put dark ink on it, which
+cleared AA. **Owner decision 2026-11-03 (v1.0.10): every orange button shows
+WHITE text, as in Figma** — a deliberate override of the AA rule for this one
+pairing. `--accent-ink` is now `--white`; the button colour is unchanged. The
+other four rows above still apply. No guard checks contrast, so no exception
+entry was needed.
 `--chrome-hint` `#9a9aa0` is the same move against the design's `#8e8e93`.
 
 **CODE** `css/tokens.css § "Signals on a light background"`; the comments at

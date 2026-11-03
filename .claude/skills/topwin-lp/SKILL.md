@@ -45,8 +45,10 @@ do not relitigate it here.
   | `#737b8c` | `#f3f4f5` | 3.86 | `--text-muted` |
   | `#737b8c` | white | 4.25 | `--text-muted` |
 
-  White ink on untouched Orange Fire is the fifth, at 3.44:1 — the CTA keeps
-  the hero colour and takes dark ink through `--accent-ink`.
+  White ink on untouched Orange Fire is the fifth, at 3.44:1 — by owner
+  decision (2026-11-03, per Figma) it is ACCEPTED: every orange button keeps
+  the hero colour and takes WHITE ink through `--accent-ink`. Do not put dark
+  ink back on orange buttons.
 - One font family. Roboto, self-hosted, both axes. `font-stretch: 75%` IS
   "Condensed"; `--font-stretch-tight` names it. Never name a second family, and
   never write `font-variation-settings: "wdth" 75` beside it.
@@ -190,6 +192,6 @@ with the exact commands. Follow it; these eight steps are the map.
 - `superpowers:test-driven-development` — no framework, no `package.json`, no
   runner. Verification is the guards in `tools/`.
 
-TEMPLATE-REV: v1.0.9 — before starting, compare this against the template's
+TEMPLATE-REV: v1.0.10 — before starting, compare this against the template's
 HEAD tag; if they differ, read the template's diff before trusting any path or
 value quoted here.

@@ -6,6 +6,14 @@ here and a bump to `TEMPLATE-REV` in
 just code, also edits `references/decisions.md` in the same commit — same
 repo, same commit, same review, so the two cannot drift apart.
 
+## v1.0.10
+
+White text on orange buttons (owner decision 2026-11-03, Figma). Shared file
+changes: `css/tokens.css` (`--accent-ink` is `--white`, was `--bg-dark`);
+SHARED.lock is regenerated. Header "Реєстрація", the form submit, the
+done-screen CTA and the demo CTA all read that token. Decision recorded in
+`references/decisions.md`; SKILL.md `TEMPLATE-REV` bumped.
+
 ## v1.0.9
 
 Header, footer and logo redrawn from Figma (nodes 42:3591 wide, 42:3651 narrow,

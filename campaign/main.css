@@ -494,14 +494,14 @@
 
 .cmp-face__text > span { display: block; line-height: calc(var(--cmp-lh) * var(--cu)); }
 
-.cmp-face__big  { font-size: calc(71.58 * var(--cu)); color: var(--accent-ink); }
+.cmp-face__big  { font-size: calc(71.58 * var(--cu)); color: var(--bg-dark); }
 .cmp-face__plus { font-size: calc(44 * var(--cu)); }
 .cmp-face__fs   { font-size: calc(53.69 * var(--cu)); }
 
 /* The dark-brown "+ / FS" of the design has no token: it is the brand orange
    mixed down toward the ink, which lands within a few steps of it. */
 .cmp-face__plus, .cmp-face__fs {
-  color: color-mix(in srgb, var(--accent) 45%, var(--accent-ink));
+  color: color-mix(in srgb, var(--accent) 45%, var(--bg-dark));
 }
 
 .cmp-face__text.is-amount { --cmp-lh: 52; }
