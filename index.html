@@ -87,7 +87,7 @@
 <link rel="stylesheet" href="css/shell.css">
 <link rel="stylesheet" href="css/form.css">
 <!-- <link rel="stylesheet" href="css/stage.css"> -->
-<!-- <link rel="stylesheet" href="css/fold.css"> -->
+<link rel="stylesheet" href="css/fold.css">
 <link rel="stylesheet" href="campaign/main.css">
 
 <noscript><style>
@@ -130,9 +130,110 @@
      the right words paint before any script runs. -->
 
 <main id="tw-main">
-  <section class="cmp-demo">
-    <p class="cmp-demo__lead" data-i18n="demo.lead">Демо-механіка.</p>
-    <button class="cmp-demo__cta" type="button" data-i18n="demo.cta">ОТРИМАТИ БОНУС</button>
+  <picture class="cmp-bg" aria-hidden="true">
+    <source media="(min-width: 900px)" type="image/avif" srcset="campaign/assets/bg-desktop-1280.avif 1280w, campaign/assets/bg-desktop-1920.avif 1920w, campaign/assets/bg-desktop-2560.avif 2560w" sizes="100vw">
+    <source media="(min-width: 900px)" type="image/webp" srcset="campaign/assets/bg-desktop-1280.webp 1280w, campaign/assets/bg-desktop-1920.webp 1920w, campaign/assets/bg-desktop-2560.webp 2560w" sizes="100vw">
+    <source type="image/avif" srcset="campaign/assets/bg-mobile-375.avif 375w, campaign/assets/bg-mobile-750.avif 750w" sizes="100vw">
+    <img src="campaign/assets/bg-mobile-750.webp" srcset="campaign/assets/bg-mobile-375.webp 375w, campaign/assets/bg-mobile-750.webp 750w" sizes="100vw" alt="" decoding="async">
+  </picture>
+
+  <section class="cmp-stage" aria-labelledby="cmp-title">
+    <div class="cmp-copy">
+      <div class="cmp-title">
+        <p class="cmp-kicker"><span class="cmp-kicker__text" data-i18n="kicker">ПЕРЕВЕРНИ КАРТКИ</span></p>
+        <h1 class="cmp-headline" id="cmp-title" data-i18n="headline">ЗАБЕРИ СВІЙ БОНУС!</h1>
+      </div>
+      <div class="cmp-status">
+        <p class="cmp-pill"><span class="cmp-pill__dots" id="cmp-dots" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></span><span class="cmp-pill__text" id="cmp-counter">Відкрито 0 з 9</span></p>
+        <p class="cmp-hint" id="cmp-hint">Відкривай карти по одній та збери 3 однакові</p>
+        <button class="cmp-claim" id="cmp-claim" type="button" hidden data-i18n="claim">Забери 250&nbsp;000&nbsp;₴ + 250 FS</button>
+      </div>
+      <p class="cmp-live" id="cmp-live" role="status" aria-live="polite"></p>
+    </div>
+
+    <ul class="cmp-grid" id="cmp-grid">
+      <li class="cmp-cell">
+        <span class="cmp-cell__shadow" aria-hidden="true"></span>
+        <span class="cmp-cell__halo" aria-hidden="true"></span>
+        <button class="cmp-card" type="button" aria-pressed="false" aria-label="Закрита картка 1 з 9">
+          <span class="cmp-flip">
+            <span class="cmp-face cmp-face--back"><img src="campaign/assets/card-back.webp" alt="" width="272" height="381" decoding="async"></span>
+          </span>
+        </button>
+      </li>
+      <li class="cmp-cell">
+        <span class="cmp-cell__shadow" aria-hidden="true"></span>
+        <span class="cmp-cell__halo" aria-hidden="true"></span>
+        <button class="cmp-card" type="button" aria-pressed="false" aria-label="Закрита картка 2 з 9">
+          <span class="cmp-flip">
+            <span class="cmp-face cmp-face--back"><img src="campaign/assets/card-back.webp" alt="" width="272" height="381" decoding="async"></span>
+          </span>
+        </button>
+      </li>
+      <li class="cmp-cell">
+        <span class="cmp-cell__shadow" aria-hidden="true"></span>
+        <span class="cmp-cell__halo" aria-hidden="true"></span>
+        <button class="cmp-card" type="button" aria-pressed="false" aria-label="Закрита картка 3 з 9">
+          <span class="cmp-flip">
+            <span class="cmp-face cmp-face--back"><img src="campaign/assets/card-back.webp" alt="" width="272" height="381" decoding="async"></span>
+          </span>
+        </button>
+      </li>
+      <li class="cmp-cell">
+        <span class="cmp-cell__shadow" aria-hidden="true"></span>
+        <span class="cmp-cell__halo" aria-hidden="true"></span>
+        <button class="cmp-card" type="button" aria-pressed="false" aria-label="Закрита картка 4 з 9">
+          <span class="cmp-flip">
+            <span class="cmp-face cmp-face--back"><img src="campaign/assets/card-back.webp" alt="" width="272" height="381" decoding="async"></span>
+          </span>
+        </button>
+      </li>
+      <li class="cmp-cell">
+        <span class="cmp-cell__shadow" aria-hidden="true"></span>
+        <span class="cmp-cell__halo" aria-hidden="true"></span>
+        <button class="cmp-card" type="button" aria-pressed="false" aria-label="Закрита картка 5 з 9">
+          <span class="cmp-flip">
+            <span class="cmp-face cmp-face--back"><img src="campaign/assets/card-back.webp" alt="" width="272" height="381" decoding="async"></span>
+          </span>
+        </button>
+      </li>
+      <li class="cmp-cell">
+        <span class="cmp-cell__shadow" aria-hidden="true"></span>
+        <span class="cmp-cell__halo" aria-hidden="true"></span>
+        <button class="cmp-card" type="button" aria-pressed="false" aria-label="Закрита картка 6 з 9">
+          <span class="cmp-flip">
+            <span class="cmp-face cmp-face--back"><img src="campaign/assets/card-back.webp" alt="" width="272" height="381" decoding="async"></span>
+          </span>
+        </button>
+      </li>
+      <li class="cmp-cell">
+        <span class="cmp-cell__shadow" aria-hidden="true"></span>
+        <span class="cmp-cell__halo" aria-hidden="true"></span>
+        <button class="cmp-card" type="button" aria-pressed="false" aria-label="Закрита картка 7 з 9">
+          <span class="cmp-flip">
+            <span class="cmp-face cmp-face--back"><img src="campaign/assets/card-back.webp" alt="" width="272" height="381" decoding="async"></span>
+          </span>
+        </button>
+      </li>
+      <li class="cmp-cell">
+        <span class="cmp-cell__shadow" aria-hidden="true"></span>
+        <span class="cmp-cell__halo" aria-hidden="true"></span>
+        <button class="cmp-card" type="button" aria-pressed="false" aria-label="Закрита картка 8 з 9">
+          <span class="cmp-flip">
+            <span class="cmp-face cmp-face--back"><img src="campaign/assets/card-back.webp" alt="" width="272" height="381" decoding="async"></span>
+          </span>
+        </button>
+      </li>
+      <li class="cmp-cell">
+        <span class="cmp-cell__shadow" aria-hidden="true"></span>
+        <span class="cmp-cell__halo" aria-hidden="true"></span>
+        <button class="cmp-card" type="button" aria-pressed="false" aria-label="Закрита картка 9 з 9">
+          <span class="cmp-flip">
+            <span class="cmp-face cmp-face--back"><img src="campaign/assets/card-back.webp" alt="" width="272" height="381" decoding="async"></span>
+          </span>
+        </button>
+      </li>
+    </ul>
   </section>
 </main>
 

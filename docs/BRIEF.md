@@ -164,3 +164,35 @@ Dots: in step 1 (1 of 9) the first dot is filled, the rest empty; filled count =
 ### "Opened but dimmed" card (frame 42:3957, step 4)
 
 An already-opened card keeps the full gold face (same gradient, frame, ornaments, text and the same `box-shadow` as the normal face, 36 / 2 / 50% glow) and the whole symbol is set to `opacity: 0.5`. No greyscale or filter. The symbol-level `drop-shadow(0 4 12 black 50%)` stays. The card that just flipped is at full opacity.
+
+## Game: flip cards 2 (built 2026-11-03)
+
+Owner-approved rules. Code: `campaign/main.js`, `campaign/main.css`, markup in `index.html` `<main id="tw-main">`.
+
+1. **Always win?** Yes. Three 250 000 ₴ + 250 FS cards, on the 4th or the 5th open (`winAt = Math.random() < 0.5 ? 4 : 5`, drawn per page load).
+2. **Interactions before the pop-up:** 4 or 5 card turns. `TW.openForm()` is called once, automatically, 1500 ms after the winning flip starts. The claim button always calls `TW.openForm()` and stays visible after the form closes.
+3. **Reveal:** the three matches take the win state (lighter face, brighter halo); after a short beat the opened non-matches dim and the unopened cards flip dimmed with faces cycled from 650% / 250% / 100%.
+4. **Reduced motion:** flip becomes a crossfade; timings 220 / 80 / 0 ms (flip / hold / reveal), as in v1. Press feedback stays.
+5. **Reload:** new game, nothing persists.
+6. **Layout mode:** fold (`css/fold.css`). The mobile footer is tall and cannot fit under a 375x667 hero, so it scrolls in below the fold; `css/stage.css` is not used. Hero scales with an artboard unit `--u` (mobile 375x585, desktop 1920x1016) derived from the container size.
+
+Prizes are dealt by click order, not by position. Script: winAt 4 -> opens 1..3 are {250k, 250k, 100%} shuffled, open 4 = 250k. winAt 5 -> opens 1..4 are {250k, 250k, 100%, 250%} shuffled, open 5 = 250k. Exactly two 250k before the win; 650% never shows before the win.
+
+Status line: start "Відкривай карти по одній та збери 3 однакові"; after any open "Чудовий старт! Шукай ще такі карти"; on the open right before the win (two 250k showing) "Майже! Наступна карта може стати виграшною"; on win the win line, then the claim button replaces the progress pill's row.
+
+### DRAFT: client review needed
+
+- **UA win line** "Вітаємо! 3 однакові — бонус твій!" is proposed, not from Figma. DRAFT.
+- **RU and EN strings** (all keys in `campaign.js` `strings.ru` / `strings.en`: kicker, headline, counter, statuses, claim, card labels, `promo.*`) were written by the developer, not by the client. DRAFT.
+- **Claim button** "Забери 250 000 ₴ + 250 FS" is not in Figma. DRAFT.
+- Form hero now reads "250 000 ₴" / "+ 250 фріспінів" via `offer` (amount 250 000, currency ₴, spins 250, hero amount) and `promo.*` overrides in `campaign.js`.
+- Frame 42:3957 (4/9) is ambiguous: it shows dimmed opened non-matching cards before the win. Implemented as: opened non-matches dim only at the win, not during play.
+
+### Deviations from Figma (all deliberate)
+
+- Status text uses Roboto 600/500, not Inter (template ships one family).
+- Gold-face text colours `#2a1600` / `#7a2e00`, the hint colour `#c9d6f2` and the yellow dot `#ffd900` have no token. Mapped to `--accent-ink`, a `color-mix` of `--accent` and `--accent-ink`, and `--second-soft`; the yellow dot is the small SVG `card-dot-on.svg`. If the owner wants the exact values, add tokens in the template.
+- Gold face gradient, frame lines, ornaments and the glow/shadow colours live inside SVGs (`card-face-bg`, `card-face-orn-top/bottom`, `card-halo`, `card-shadow`, `card-dot-on`) because `css/tokens.css` is shared and has no such colours. The shadow and halo are sibling elements of the card button (never on the rotating node).
+- The Figma mobile frame draws a second logo above the title; the shell header already has the logo, so it is not repeated.
+- Cards, grid and title are sized by `--u`, so at 1920x1080 they render at about 0.915 of the Figma size (the fold leaves 92% of the screen height).
+- The 650% + 250 FS and 250% + 50 FS faces were not measured in Figma; sized from the 100% face.

@@ -1,115 +1,531 @@
 /* ═══════════════════════════════════════════════════════════════
-   THE CAMPAIGN'S STYLESHEET
+   FLIP CARDS 2 — the campaign's stylesheet
 
-   Replace everything below. This file and campaign/main.js are the mechanic;
-   nothing else in the repo is.
+   LAYOUT MODE: B2, the fold (css/fold.css). The mobile footer is tall (payment
+   marks, copyright) and does not fit under a 375x667 hero, so it scrolls in
+   below the fold and css/stage.css is not used.
 
-   What ships here is the demo: a line of copy and a button that opens the
-   registration dialog, so there is something working to replace rather than
-   an empty file.
+   ARTBOARD UNIT. #tw-main is a size container (fold.css), so --u below is
+   "one Figma pixel", derived from the room the hero actually got and capped so
+   the whole 375 / 1920 artboard fits. Layout and the card art multiply Figma's
+   numbers by --u; the small text that carries the instructions has a px floor
+   so browser zoom and tiny windows do not shrink it into illegibility.
 
-   ── The rules that still apply to you ────────────────────────
-   1. NO HEX LITERALS, no rgb()/rgba(), and no --orange-N / --navy-N. Ask for
-      the semantic tokens in css/tokens.css: --accent, --accent-on-light,
-      --surface, --text, --text-muted, --danger, --r-md, --ease-out, --font.
-      `python tools/tokens.py --check` fails the build on any of them, and it
-      exists because two landings ago three stylesheets each invented their
-      own "same" green.
+     mobile   artboard 375 x 585      (frame 375 wide; the Figma logo row is the
+                                       shell header here, so this is what is left)
+     desktop  artboard 1920 x 1016    (frame 1920x1080 minus the 64px header)
 
-   2. Prefix your classes `cmp-`. The shell owns `tw-`.
-
-   3. Small text obeys the AA table: never #00a75c or #ff4500 on white for
-      body copy — use --green-on-light and --accent-on-light. The 500s stay
-      hero colours for large type and filled shapes.
-
-   4. Any input you add is at least 16px, or iOS Safari zooms the page on
-      focus.
-
-   ── Choosing a layout ────────────────────────────────────────
-   Four modes; the shell supports all four and assumes none.
-
-   A. SCROLLING PAGE — the default. Do nothing. The header, your <main> and
-      the footer are ordinary blocks. Add `position: sticky; top: 0` to
-      .tw-hdr here if you want the bar to follow.
-
-   B. FIXED STAGE, NEVER SCROLLS — uncomment the css/stage.css <link> in
-      index.html. body becomes a flex column, the two bars keep their height
-      and #tw-main takes the rest. Size things against the stage container
-      (cqh/cqw) INSIDE your own elements; the shell stays px.
-
-   B2. THE FOLD — uncomment css/fold.css instead. #tw-main is a definite box,
-      92svh minus the header, the page scrolls and the footer starts below the
-      fold with only its top edge showing. Same cqh/cqw container (tw-main) as
-      mode B. Link one of the two, never both.
-
-   C. ARTBOARD UNIT — for a hero that is a pixel-exact Figma comp. Define
-      the unit here and multiply Figma's own numbers by it:
-
-        #tw-main {
-          --u: min(calc(100vw / 375), calc(100svh / 666));
-        }
-        @media (min-width: 900px) {
-          #tw-main { --u: min(calc(100vw / 1920), calc(100svh / 1080)); }
-        }
-        .cmp-thing { width: calc(240 * var(--u)); }
-
-      Use it only for the mechanic. Text the visitor reads stays in real px:
-      viewport units break browser zoom.
+   NO colour literals in this file. Colours come from css/tokens.css; the few
+   gold-face colours the tokens do not have (the face gradient, its frame
+   lines, the ornaments, the glow) live inside the SVG art in campaign/assets/.
    ═══════════════════════════════════════════════════════════════ */
 
+/* ══ the stage ════════════════════════════════════════════════ */
 
-/* ══ demo mechanic — delete all of this ═══════════════════════ */
-
-/* The sticky-footer pattern for mode A: the page is at least the viewport
-   tall, and #tw-main takes whatever the two bars leave. Delete it if your
-   campaign is taller than the screen anyway, and delete the whole block if
-   you switch to css/stage.css, which does this and more. */
-body {
-  display: flex;
-  flex-direction: column;
-  min-height: 100vh;
-  background: var(--surface);
+.cmp-bg {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
 }
 
-#tw-main { flex: 1 0 auto; display: flex; }
+.cmp-bg img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center top;
+}
 
-.cmp-demo {
-  flex: 1;
+.cmp-stage {
+  --u: min(calc(100cqw / 375), calc(100cqh / 585));
+  --cu: calc(var(--u) * .306);                 /* one unit of the 272x381 card */
+  position: relative;
+  z-index: 1;
+  width: calc(375 * var(--u));
+  height: calc(585 * var(--u));
+  margin: 0 auto;
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
-  gap: 28px;
-  padding: 48px 24px;
+  padding-top: calc(16 * var(--u));
+}
+
+/* the copy block dissolves on mobile: title, grid, status are one column */
+.cmp-copy { display: contents; }
+
+.cmp-title  { order: 1; text-align: center; }
+.cmp-grid   { order: 2; }
+.cmp-status { order: 3; }
+
+@media (min-width: 900px) {
+  .cmp-stage {
+    --u: min(calc(100cqw / 1920), calc(100cqh / 1016));
+    --cu: calc(var(--u) * .6485);
+    display: block;
+    width: calc(1920 * var(--u));
+    height: calc(1016 * var(--u));
+    padding-top: 0;
+  }
+
+  .cmp-copy {
+    position: absolute;
+    left: calc(152 * var(--u));
+    top: 0;
+    height: 100%;
+    width: calc(875 * var(--u));
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: calc(48 * var(--u));
+  }
+
+  .cmp-title, .cmp-status { text-align: left; }
+  .cmp-status { align-items: flex-start; }
+
+  .cmp-grid {
+    position: absolute;
+    left: calc(1173 * var(--u));
+    top: calc(109 * var(--u));
+  }
+}
+
+/* ══ title ════════════════════════════════════════════════════ */
+
+.cmp-title {
+  display: flex;
+  flex-direction: column;
+  gap: calc(6 * var(--u));
+  align-items: center;
+  font-family: var(--font);
+  font-style: italic;
+  font-weight: var(--fw-black);
+  font-stretch: var(--font-stretch-tight);
+  text-transform: uppercase;
+}
+
+.cmp-kicker {
+  display: flex;
+  align-items: center;
+  gap: calc(10 * var(--u));
+  color: var(--text);
+  font-size: calc(18 * var(--u));
+  line-height: 1.1;
+  letter-spacing: calc(.72 * var(--u));
+}
+
+/* ornament: line, star, text, star, line */
+.cmp-kicker::before,
+.cmp-kicker::after {
+  content: "";
+  flex: none;
+  width: calc(32 * var(--u));
+  height: calc(2 * var(--u));
+  border-radius: 2px;
+  background: linear-gradient(to right, var(--accent), transparent);
+}
+.cmp-kicker::before { background: linear-gradient(to left, var(--accent), transparent); }
+
+.cmp-kicker__text {
+  display: inline-flex;
+  align-items: center;
+  gap: calc(10 * var(--u));
+}
+.cmp-kicker__text::before,
+.cmp-kicker__text::after {
+  content: "";
+  flex: none;
+  width: calc(8 * var(--u));
+  height: calc(8 * var(--u));
+  background: var(--accent);
+  clip-path: polygon(50% 0, 61% 35%, 98% 38%, 68% 59%, 79% 91%, 50% 72%, 21% 91%, 32% 59%, 2% 38%, 39% 35%);
+}
+
+.cmp-headline {
+  color: var(--accent);
+  font-size: calc(37 * var(--u));
+  line-height: 1;
+  white-space: nowrap;
+  text-shadow:
+    0 calc(1 * var(--u)) 0 color-mix(in srgb, var(--accent) 56%, var(--surface-sunken)),
+    0 0 calc(16 * var(--u)) color-mix(in srgb, var(--accent) 40%, transparent);
+}
+
+@media (min-width: 900px) {
+  .cmp-title { align-items: flex-start; gap: calc(10 * var(--u)); }
+
+  .cmp-kicker {
+    font-size: calc(44 * var(--u));
+    letter-spacing: calc(1.76 * var(--u));
+    gap: calc(20 * var(--u));
+  }
+  .cmp-kicker::before, .cmp-kicker::after {
+    width: calc(96 * var(--u));
+    height: calc(3 * var(--u));
+  }
+  .cmp-kicker__text { gap: calc(20 * var(--u)); }
+  .cmp-kicker__text::before, .cmp-kicker__text::after {
+    width: calc(14 * var(--u));
+    height: calc(14 * var(--u));
+  }
+
+  .cmp-headline {
+    font-size: calc(106 * var(--u));
+    text-shadow:
+      0 calc(6 * var(--u)) 0 color-mix(in srgb, var(--accent) 56%, var(--surface-sunken)),
+      0 0 calc(36 * var(--u)) color-mix(in srgb, var(--accent) 40%, transparent);
+  }
+}
+
+/* ══ progress and status ══════════════════════════════════════ */
+
+.cmp-status {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: calc(4 * var(--u));
+  margin-top: calc(20 * var(--u));
+  font-family: var(--font);
+}
+
+.cmp-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: calc(6 * var(--u));
+  padding: calc(4 * var(--u)) calc(10 * var(--u));
+  border: 1px solid color-mix(in srgb, var(--text) 16%, transparent);
+  border-radius: var(--r-pill);
+  background: color-mix(in srgb, var(--text) 8%, transparent);
+  color: var(--text);
+  font-size: max(12px, calc(12 * var(--u)));
+  font-weight: var(--fw-semi);
+}
+
+.cmp-pill__dots { display: inline-flex; gap: calc(3 * var(--u)); }
+
+.cmp-pill__dots i {
+  width: calc(6 * var(--u));
+  height: calc(6 * var(--u));
+  min-width: 5px;
+  min-height: 5px;
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--text) 25%, transparent);
+  transition: background-color 160ms var(--ease-out);
+}
+
+/* The lit dot is a small SVG: the yellow has no token. */
+.cmp-pill__dots i[data-on] {
+  background: url("assets/card-dot-on.svg") center / 100% 100% no-repeat;
+}
+
+.cmp-hint {
+  max-width: 24em;
+  color: var(--second-soft);
+  font-size: max(13px, calc(13 * var(--u)));
+  font-weight: var(--fw-medium);
+  line-height: 1.3;
   text-align: center;
 }
 
-.cmp-demo__lead {
-  max-width: 24rem;
-  color: var(--text);
-  font-family: var(--font);
-  font-size: 20px;
-  font-weight: var(--fw-medium);
-  line-height: 1.35;
+.cmp-live {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
 }
 
-.cmp-demo__cta {
-  min-height: 56px;
-  padding: 0 32px;
+@media (min-width: 900px) {
+  .cmp-status { align-items: flex-start; gap: calc(8 * var(--u)); margin-top: 0; }
+
+  .cmp-pill {
+    gap: calc(8 * var(--u));
+    padding: calc(6 * var(--u)) calc(14 * var(--u));
+    font-size: max(13px, calc(14 * var(--u)));
+  }
+  .cmp-pill__dots { gap: calc(4 * var(--u)); }
+  .cmp-pill__dots i { width: calc(8 * var(--u)); height: calc(8 * var(--u)); }
+
+  .cmp-hint {
+    max-width: none;
+    font-size: max(16px, calc(20 * var(--u)));
+    text-align: left;
+  }
+}
+
+/* ══ the claim button ═════════════════════════════════════════ */
+
+.cmp-claim {
+  min-height: 48px;
+  padding: 0 calc(24 * var(--u));
   border-radius: var(--r-md);
   background: var(--accent);
   color: var(--accent-ink);
   font-family: var(--font);
-  font-size: 18px;
+  font-size: max(16px, calc(16 * var(--u)));
   font-weight: var(--fw-black);
   letter-spacing: .02em;
+  white-space: nowrap;
   box-shadow: var(--glow-accent);
-  transition: scale 140ms var(--ease-out), background-color 140ms var(--ease-out);
+  opacity: 0;
+  translate: 0 8px;
+  transition: opacity 260ms var(--ease-out), translate 260ms var(--ease-out),
+              scale 140ms var(--ease-out), background-color 140ms var(--ease-out);
 }
 
-.cmp-demo__cta:active { scale: .97; background: var(--accent-press); }
+.cmp-claim.is-on { opacity: 1; translate: 0 0; }
+.cmp-claim:active { scale: .97; background: var(--accent-press); }
+.cmp-claim:focus-visible { outline: 2px solid var(--text); outline-offset: 3px; }
 
-.cmp-demo__cta:focus-visible {
+@media (min-width: 900px) {
+  .cmp-claim {
+    min-height: calc(64 * var(--u));
+    padding: 0 calc(40 * var(--u));
+    font-size: max(18px, calc(26 * var(--u)));
+    border-radius: var(--r-lg);
+  }
+}
+
+/* ══ the grid ═════════════════════════════════════════════════ */
+
+.cmp-grid {
+  display: grid;
+  grid-template-columns: repeat(3, calc(272 * var(--cu)));
+  column-gap: calc(17.15 * var(--u));
+  row-gap: calc(17.86 * var(--u));
+  margin-top: calc(24 * var(--u));
+  list-style: none;
+  padding: 0;
+}
+
+@media (min-width: 900px) {
+  .cmp-grid {
+    column-gap: calc(36.35 * var(--u));
+    row-gap: calc(37.86 * var(--u));
+    margin-top: 0;
+  }
+}
+
+/* Three levels, and they never share a job:
+     .cmp-cell   layout box, never moves; holds the shadow and the halo
+     .cmp-card   perspective host, hit target, focus ring, 2D transforms
+     .cmp-flip   preserve-3d; its transform is rotateY and nothing else
+   The shadow and the halo are SIBLINGS of the button. A filter or a
+   box-shadow on .cmp-flip would force transform-style back to flat and the
+   rotation would collapse into a sideways squash. */
+
+.cmp-cell {
+  --cmp-flip-ms: 520ms;
+  position: relative;
+  width: calc(272 * var(--cu));
+  height: calc(381 * var(--cu));
+}
+
+.cmp-cell__shadow,
+.cmp-cell__halo {
+  position: absolute;
+  pointer-events: none;
+  background-repeat: no-repeat;
+  background-size: 100% 100%;
+}
+
+.cmp-cell__shadow {
+  left: calc(-50 * var(--cu));
+  top: calc(-64 * var(--cu));
+  width: calc(372 * var(--cu));
+  height: calc(481 * var(--cu));
+  background-image: url("assets/card-shadow.svg");
+}
+
+.cmp-cell__halo {
+  left: calc(-80 * var(--cu));
+  top: calc(-80 * var(--cu));
+  width: calc(432 * var(--cu));
+  height: calc(541 * var(--cu));
+  background-image: url("assets/card-halo.svg");
+  opacity: 0;
+  transition: opacity 260ms var(--ease-out) var(--cmp-flip-ms);
+}
+
+.cmp-cell[data-face="front"] .cmp-cell__halo { opacity: .5; }
+.cmp-cell[data-win] .cmp-cell__halo { opacity: .7; }
+
+.cmp-card {
+  position: absolute;
+  inset: 0;
+  display: block;
+  border-radius: calc(32 * var(--cu));
+  /* In card units, so the same depth reads on the 176px and the 83px card. */
+  perspective: calc(900 * var(--cu));
+  transition: transform 180ms var(--ease-out);
+}
+
+.cmp-cell:not([data-face="front"]) .cmp-card:hover { transform: translateY(calc(-4 * var(--cu))); }
+.cmp-cell:not([data-face="front"]) .cmp-card:active { transform: scale(.97); }
+.cmp-cell[data-face="front"] .cmp-card { cursor: default; }
+
+.cmp-card:focus-visible {
   outline: 2px solid var(--text);
   outline-offset: 3px;
+}
+
+.cmp-flip {
+  position: relative;
+  display: block;
+  width: 100%;
+  height: 100%;
+  transform-style: preserve-3d;
+  transition: transform var(--cmp-flip-ms) cubic-bezier(.37, 0, .63, 1);
+}
+
+.cmp-cell[data-face="front"] .cmp-flip { transform: rotateY(180deg); }
+
+.cmp-face {
+  position: absolute;
+  inset: 0;
+  display: block;
+  border-radius: calc(32 * var(--cu));
+  overflow: hidden;   /* on the FACE, never on .cmp-flip */
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+
+/* A half unit of separation stops the coplanar faces z-fighting near 90deg. */
+.cmp-face--back  { transform: translateZ(calc(.5 * var(--cu))); }
+.cmp-face--front {
+  transform: rotateY(180deg) translateZ(calc(.5 * var(--cu)));
+  transition: opacity 260ms var(--ease-out);
+}
+
+.cmp-face--back img { width: 100%; height: 100%; display: block; }
+
+/* the dimmed state: the whole symbol at half opacity, no greyscale */
+.cmp-cell[data-dim] .cmp-face--front { opacity: .5; }
+
+/* ── the gold face ──────────────────────────────────────────── */
+
+.cmp-face__bg,
+.cmp-face__rays,
+.cmp-face__glow,
+.cmp-face__corner,
+.cmp-face__orn {
+  position: absolute;
+  display: block;
+  pointer-events: none;
+}
+
+.cmp-face__bg { inset: 0; width: 100%; height: 100%; }
+
+.cmp-face__rays {
+  left: 50%; top: 50%;
+  width: calc(520 * var(--cu)); height: calc(520 * var(--cu));
+  translate: -50% -50%;
+}
+
+.cmp-face__glow {
+  left: 50%; top: 50%;
+  width: calc(360 * var(--cu)); height: calc(360 * var(--cu));
+  translate: -50% -50%;
+}
+
+.cmp-face__corner { width: calc(24 * var(--cu)); height: calc(24 * var(--cu)); }
+.cmp-face__corner--tl { left: calc(17 * var(--cu)); top: calc(17 * var(--cu)); }
+.cmp-face__corner--tr { right: calc(17 * var(--cu)); top: calc(17 * var(--cu)); }
+.cmp-face__corner--bl { left: calc(17 * var(--cu)); bottom: calc(17 * var(--cu)); }
+.cmp-face__corner--br { right: calc(17 * var(--cu)); bottom: calc(17 * var(--cu)); }
+
+.cmp-face__orn {
+  left: 50%;
+  width: calc(96 * var(--cu));
+  height: calc(14 * var(--cu));
+  translate: -50% 0;
+}
+.cmp-face__orn--top    { top: calc(39 * var(--cu)); }
+.cmp-face__orn--bottom { top: calc(325 * var(--cu)); }
+
+/* the sheen: a soft diagonal band; --text is white */
+.cmp-face__sheen {
+  position: absolute;
+  top: -10%;
+  left: 14%;
+  width: calc(70 * var(--cu));
+  height: 120%;
+  rotate: 28deg;
+  background: linear-gradient(to right, transparent, color-mix(in srgb, var(--text) 35%, transparent), transparent);
+  pointer-events: none;
+}
+
+/* the win state: a lift on the face. The glow is the sibling halo. */
+.cmp-face--front::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: var(--text);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 260ms var(--ease-out);
+}
+.cmp-cell[data-win] .cmp-face--front::after { opacity: .2; }
+
+/* text box measured from Figma: x 19..244, y 109..264 of the 272x381 card */
+.cmp-face__text {
+  --cmp-lh: 47.24;
+  position: absolute;
+  left: calc(19 * var(--cu));
+  top: calc(109 * var(--cu));
+  width: calc(225 * var(--cu));
+  height: calc(155 * var(--cu));
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font);
+  font-weight: var(--fw-black);
+  text-transform: uppercase;
+  text-align: center;
+  white-space: nowrap;
+  text-shadow: 0 calc(1 * var(--cu)) 0 color-mix(in srgb, var(--text) 60%, transparent);
+}
+
+.cmp-face__text > span { display: block; line-height: calc(var(--cmp-lh) * var(--cu)); }
+
+.cmp-face__big  { font-size: calc(71.58 * var(--cu)); color: var(--accent-ink); }
+.cmp-face__plus { font-size: calc(44 * var(--cu)); }
+.cmp-face__fs   { font-size: calc(53.69 * var(--cu)); }
+
+/* The dark-brown "+ / FS" of the design has no token: it is the brand orange
+   mixed down toward the ink, which lands within a few steps of it. */
+.cmp-face__plus, .cmp-face__fs {
+  color: color-mix(in srgb, var(--accent) 45%, var(--accent-ink));
+}
+
+.cmp-face__text.is-amount { --cmp-lh: 52; }
+.cmp-face__text.is-amount .cmp-face__big  { font-size: calc(46 * var(--cu)); }
+.cmp-face__text.is-amount .cmp-face__plus { font-size: calc(40 * var(--cu)); }
+.cmp-face__text.is-amount .cmp-face__fs   { font-size: calc(50 * var(--cu)); }
+
+/* ══ reduced motion ═══════════════════════════════════════════
+   DEGRADES, never removes: the rotation becomes a crossfade, press feedback
+   stays. 220 ms is v1's number. */
+
+@media (prefers-reduced-motion: reduce) {
+  .cmp-cell { --cmp-flip-ms: 220ms; }
+
+  .cmp-flip { transform: none !important; transform-style: flat; }
+
+  .cmp-face {
+    backface-visibility: visible;
+    -webkit-backface-visibility: visible;
+    transition: opacity var(--cmp-flip-ms) ease;
+  }
+
+  .cmp-face--front { transform: none !important; opacity: 0; }
+  .cmp-face--back  { transform: none !important; opacity: 1; }
+
+  .cmp-cell[data-face="front"] .cmp-face--front { opacity: 1; }
+  .cmp-cell[data-face="front"] .cmp-face--back  { opacity: 0; }
+  .cmp-cell[data-face="front"][data-dim] .cmp-face--front { opacity: .5; }
+
+  .cmp-card { transition-duration: 120ms; }
+  .cmp-claim { transition-duration: 120ms; translate: 0 0; }
 }
