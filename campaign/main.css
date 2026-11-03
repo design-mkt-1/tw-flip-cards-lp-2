@@ -11,9 +11,11 @@
    numbers by --u; the small text that carries the instructions has a px floor
    so browser zoom and tiny windows do not shrink it into illegibility.
 
-     mobile   artboard 375 x 585      (frame 375 wide; the Figma logo row is the
+     mobile   artboard 375 x 566      (frame 375 wide; the Figma logo row is the
                                        shell header here, so this is what is left)
-     desktop  artboard 1920 x 1016    (frame 1920x1080 minus the 64px header)
+     desktop  artboard 1920 x 940     (Figma hero is 1920x972 under a 108px header; the
+                                       shell header is 64px, so 1080 leaves 930 and the
+                                       artboard is 940 to keep --u at ~.99)
 
    NO colour literals in this file. Colours come from css/tokens.css; the few
    gold-face colours the tokens do not have (the face gradient, its frame
@@ -37,17 +39,17 @@
 }
 
 .cmp-stage {
-  --u: min(calc(100cqw / 375), calc(100cqh / 585));
+  --u: min(calc(100cqw / 375), calc(100cqh / 566));
   --cu: calc(var(--u) * .306);                 /* one unit of the 272x381 card */
   position: relative;
   z-index: 1;
   width: calc(375 * var(--u));
-  height: calc(585 * var(--u));
+  height: calc(566 * var(--u));
   margin: 0 auto;
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding-top: calc(16 * var(--u));
+  padding-top: calc(12 * var(--u));
 }
 
 /* the copy block dissolves on mobile: title, grid, status are one column */
@@ -59,33 +61,33 @@
 
 @media (min-width: 900px) {
   .cmp-stage {
-    --u: min(calc(100cqw / 1920), calc(100cqh / 1016));
+    --u: min(calc(100cqw / 1920), calc(100cqh / 940));
     --cu: calc(var(--u) * .6485);
     display: block;
     width: calc(1920 * var(--u));
-    height: calc(1016 * var(--u));
+    height: calc(940 * var(--u));
     padding-top: 0;
   }
 
   .cmp-copy {
     position: absolute;
-    left: calc(152 * var(--u));
+    left: calc(123 * var(--u));
     top: 0;
     height: 100%;
-    width: calc(875 * var(--u));
+    width: calc(875.2 * var(--u));
     display: flex;
     flex-direction: column;
     justify-content: center;
     gap: calc(48 * var(--u));
   }
 
-  .cmp-title, .cmp-status { text-align: left; }
-  .cmp-status { align-items: flex-start; }
+  /* Figma 42:3957: eyebrow, headline and status all sit on the column's centre line */
+  .cmp-title, .cmp-status { text-align: center; }
 
   .cmp-grid {
     position: absolute;
     left: calc(1173 * var(--u));
-    top: calc(109 * var(--u));
+    top: calc(62 * var(--u));
   }
 }
 
@@ -151,7 +153,7 @@
 }
 
 @media (min-width: 900px) {
-  .cmp-title { align-items: flex-start; gap: calc(10 * var(--u)); }
+  .cmp-title { gap: calc(10 * var(--u)); }
 
   .cmp-kicker {
     font-size: calc(44 * var(--u));
@@ -183,7 +185,7 @@
   flex-direction: column;
   align-items: center;
   gap: calc(4 * var(--u));
-  margin-top: calc(20 * var(--u));
+  margin-top: calc(12 * var(--u));
   font-family: var(--font);
 }
 
@@ -236,7 +238,7 @@
 }
 
 @media (min-width: 900px) {
-  .cmp-status { align-items: flex-start; gap: calc(8 * var(--u)); margin-top: 0; }
+  .cmp-status { gap: calc(8 * var(--u)); margin-top: 0; }
 
   .cmp-pill {
     gap: calc(8 * var(--u));
@@ -249,7 +251,7 @@
   .cmp-hint {
     max-width: none;
     font-size: max(16px, calc(20 * var(--u)));
-    text-align: left;
+    text-align: center;
   }
 }
 
@@ -349,6 +351,8 @@
 
 .cmp-cell[data-face="front"] .cmp-cell__halo { opacity: .5; }
 .cmp-cell[data-win] .cmp-cell__halo { opacity: .7; }
+/* dimmed cards give their glow back at once (no flip delay to wait for) */
+.cmp-cell[data-dim] .cmp-cell__halo { opacity: 0; transition-delay: 0s; }
 
 .cmp-card {
   position: absolute;

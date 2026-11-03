@@ -174,7 +174,7 @@ Owner-approved rules. Code: `campaign/main.js`, `campaign/main.css`, markup in `
 3. **Reveal:** the three matches take the win state (lighter face, brighter halo); after a short beat the opened non-matches dim and the unopened cards flip dimmed with faces cycled from 650% / 250% / 100%.
 4. **Reduced motion:** flip becomes a crossfade; timings 220 / 80 / 0 ms (flip / hold / reveal), as in v1. Press feedback stays.
 5. **Reload:** new game, nothing persists.
-6. **Layout mode:** fold (`css/fold.css`). The mobile footer is tall and cannot fit under a 375x667 hero, so it scrolls in below the fold; `css/stage.css` is not used. Hero scales with an artboard unit `--u` (mobile 375x585, desktop 1920x1016) derived from the container size.
+6. **Layout mode:** fold (`css/fold.css`). The mobile footer is tall and cannot fit under a 375x667 hero, so it scrolls in below the fold; `css/stage.css` is not used. Hero scales with an artboard unit `--u` (mobile 375x566, desktop 1920x940) derived from the container size.
 
 Prizes are dealt by click order, not by position. Script: winAt 4 -> opens 1..3 are {250k, 250k, 100%} shuffled, open 4 = 250k. winAt 5 -> opens 1..4 are {250k, 250k, 100%, 250%} shuffled, open 5 = 250k. Exactly two 250k before the win; 650% never shows before the win.
 

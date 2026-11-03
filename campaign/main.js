@@ -106,7 +106,8 @@
       won: false,
       status: 'start',    /* start | good | almost | win */
       lastCard: null,
-      formOpened: false
+      formOpened: false,
+      sequenceStarted: false
     };
 
     /* ── text ────────────────────────────────────────────────── */
@@ -117,7 +118,9 @@
       var btn = cell.querySelector('.cmp-card');
       var n = cells.indexOf(cell) + 1;
       var label;
-      if (cell.dataset.face !== 'front') {
+      /* data-taken, not data-face: face lands two frames after the click, and
+         a label (or any "is it open" test) must agree with the click guard. */
+      if (!cell.hasAttribute('data-taken')) {
         label = TW.t('card.back', { n: n });
       } else {
         label = TW.t(cell.hasAttribute('data-win') ? 'card.win' : 'card.face',
@@ -194,6 +197,9 @@
 
     function turn(cell, key, dim) {
       var btn = cell.querySelector('.cmp-card');
+      /* The ONE synchronous "this card is taken" mark. Every "is it open or
+         available" test reads it, never data-face (set two frames later). */
+      cell.setAttribute('data-taken', '');
       cell.dataset.prize = key;
       cell.querySelector('.cmp-flip').appendChild(buildFace(key));
       if (dim) cell.setAttribute('data-dim', '');
@@ -211,6 +217,11 @@
     /* ── the game ────────────────────────────────────────────── */
 
     function flipCard(cell) {
+      /* Taken first, before anything reads state or schedules a frame: a second
+         click on the same card in the next millisecond finds it already gone. */
+      if (cell.hasAttribute('data-taken') || state.locked || state.opened >= winAt) return;
+      cell.setAttribute('data-taken', '');
+
       var key = script[state.opened];
       var isWin = state.opened === winAt - 1;
 
@@ -235,7 +246,10 @@
     }
 
     function revealRest() {
-      var rest = cells.filter(function (c) { return c.dataset.face !== 'front'; });
+      var rest = cells.filter(function (c) { return !c.hasAttribute('data-taken'); });
+      /* Mark them all now: the turns below are staggered, and nothing may pick
+         a card that is waiting for its turn. */
+      rest.forEach(function (c) { c.setAttribute('data-taken', ''); });
       var step = Math.round(timing().flip / 8);
       rest.forEach(function (cell, i) {
         window.setTimeout(function () {
@@ -254,6 +268,8 @@
     }
 
     function runWinSequence() {
+      if (state.sequenceStarted) return;
+      state.sequenceStarted = true;
       var T = timing();
 
       /* 1. the flip lands, the three matches take the win state */
@@ -296,8 +312,7 @@
     grid.addEventListener('click', function (ev) {
       var cell = ev.target.closest ? ev.target.closest('.cmp-cell') : null;
       if (!cell || !grid.contains(cell)) return;
-      if (state.locked || cell.dataset.face === 'front') return;
-      flipCard(cell);
+      flipCard(cell);   /* the guard is inside, on the synchronous mark */
     });
 
     /* The claim button always opens the form, before and after the auto-open
